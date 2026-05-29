@@ -160,3 +160,19 @@
   .swds-field-control { flex-direction: column; align-items: flex-start; }
   .swds-tab { padding: 9px 11px; font-size: 12px; }
 }
+
+/* Component library — collapsible categories */
+.swds-comp-cat { margin-bottom: 12px; border: 1px solid var(--swds-border); border-radius: var(--swds-radius); background: var(--swds-card); box-shadow: var(--swds-shadow); overflow: hidden; }
+.swds-comp-cat-head {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; background: none; border: 0; cursor: pointer;
+  font-size: 14px; font-weight: 700; color: var(--swds-ink); text-align: left;
+}
+.swds-comp-cat-head:hover { background: #f7f9fc; }
+.swds-comp-cat-arrow { transition: transform .18s ease; opacity: .7; }
+.swds-comp-cat.is-open .swds-comp-cat-arrow { transform: rotate(90deg); }
+.swds-comp-cat-label { flex: 1; }
+.swds-comp-cat-count { background: var(--swds-blue); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+.swds-comp-cat-body { display: none; padding: 0 16px 8px; }
+.swds-comp-cat.is-open .swds-comp-cat-body { display: block; }
+.swds-comp-cat-body .swds-comp { box-shadow: none; border-color: var(--swds-border); }

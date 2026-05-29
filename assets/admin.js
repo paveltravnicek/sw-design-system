@@ -58,5 +58,10 @@
         document.execCommand('copy'); done();
       }
     });
+
+    // Library: collapsible categories
+    $(document).on('click', '[data-cat-toggle]', function () {
+      $(this).closest('[data-cat]').toggleClass('is-open');
+    });
   });
 })(jQuery);

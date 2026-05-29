@@ -183,26 +183,40 @@ $tabs['library'] = array( 'title' => 'Komponenty', 'icon' => 'block-default' );
         </div>
 
         <?php /* ---------- Library panel ---------- */
-        $library = SWDS_Library::components();
-        $has_remote = false;
-        foreach ( $library as $c ) { if ( 'remote' === $c['source'] ) { $has_remote = true; break; } }
+        $groups = SWDS_Library::grouped();
+        $has_remote = false; $total = 0;
+        foreach ( $groups as $g ) {
+            foreach ( $g['items'] as $c ) { $total++; if ( 'remote' === $c['source'] ) { $has_remote = true; } }
+        }
         ?>
         <div class="swds-panel" data-panel="library">
-            <p class="swds-intro">Hotové komponenty. Zkopírujte HTML a vložte do LiveCanvas (Add Section → prázdná → Edit Code), nebo do Edit Main HTML. Styl se načte automaticky z design systému. <strong>Nové komponenty se přidávají na GitHubu</strong> (soubor + záznam v <code>components.json</code>) — bez nutnosti aktualizovat plugin. Tlačítkem níže načtete aktuální seznam.</p>
+            <p class="swds-intro">Hotové komponenty rozdělené do kategorií. Zkopírujte HTML a vložte do LiveCanvas (Add Section → prázdná → Edit Code), nebo do Edit Main HTML. Styl se načte automaticky z design systému. <strong>Komponenty i kategorie se spravují na GitHubu</strong> v souboru <code>components.json</code> — bez nutnosti aktualizovat plugin. Klikem na název kategorie ji sbalíte/rozbalíte.</p>
 
             <p style="margin:-8px 0 18px;">
                 <button type="submit" name="swds_action" value="refresh_library" class="button">↻ Načíst komponenty z GitHubu</button>
-                <span class="swds-help" style="margin-left:10px;">Zdroj: <?php echo $has_remote ? 'GitHub (aktuální)' : 'lokální (vestavěné v pluginu)'; ?></span>
+                <span class="swds-help" style="margin-left:10px;">Zdroj: <?php echo $has_remote ? 'GitHub (aktuální)' : 'lokální (vestavěné v pluginu)'; ?> · komponent: <?php echo (int) $total; ?></span>
             </p>
 
-            <?php $i = 0; foreach ( $library as $c ) :
-                $id = 'swds-code-' . $i; $i++; ?>
-                <div class="swds-comp">
-                    <div class="swds-comp-head">
-                        <h3><?php echo esc_html( $c['title'] ); ?></h3>
-                        <button type="button" class="button swds-copy" data-target="<?php echo esc_attr( $id ); ?>">Kopírovat HTML</button>
+            <?php $i = 0; foreach ( $groups as $gi => $g ) :
+                $open = ( 0 === $gi ); // first category open by default ?>
+                <div class="swds-comp-cat<?php echo $open ? ' is-open' : ''; ?>" data-cat>
+                    <button type="button" class="swds-comp-cat-head" data-cat-toggle>
+                        <span class="swds-comp-cat-arrow dashicons dashicons-arrow-right-alt2"></span>
+                        <span class="swds-comp-cat-label"><?php echo esc_html( $g['label'] ); ?></span>
+                        <span class="swds-comp-cat-count"><?php echo count( $g['items'] ); ?></span>
+                    </button>
+                    <div class="swds-comp-cat-body">
+                        <?php foreach ( $g['items'] as $c ) :
+                            $id = 'swds-code-' . $i; $i++; ?>
+                            <div class="swds-comp">
+                                <div class="swds-comp-head">
+                                    <h3><?php echo esc_html( $c['title'] ); ?></h3>
+                                    <button type="button" class="button swds-copy" data-target="<?php echo esc_attr( $id ); ?>">Kopírovat HTML</button>
+                                </div>
+                                <textarea class="swds-code" id="<?php echo esc_attr( $id ); ?>" readonly rows="6"><?php echo esc_textarea( $c['code'] ); ?></textarea>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <textarea class="swds-code" id="<?php echo esc_attr( $id ); ?>" readonly rows="6"><?php echo esc_textarea( $c['code'] ); ?></textarea>
                 </div>
             <?php endforeach; ?>
         </div>

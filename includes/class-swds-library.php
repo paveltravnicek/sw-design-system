@@ -4,23 +4,26 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 /**
  * SWDS_Library
  *
- * Loads the component library. Two sources, in order:
- *   1. Remote manifest on GitHub (raw JSON) — lets you add components by
- *      committing files to the repo, with NO plugin release.
- *   2. Local bundled components in /components/ — always-present fallback,
- *      used if the remote is unreachable or returns nothing.
+ * Loads the component library, grouped into categories. Two sources:
+ *   1. Remote manifest on GitHub (via API, with raw fallback) — add or
+ *      recategorize components by committing to the repo, NO plugin release.
+ *   2. Local bundled components — always-present fallback / offline.
  *
- * The remote result is cached in a transient (default 6h) so we don't hit
- * GitHub on every page load. A "Načíst znovu" button clears the cache.
+ * Result cached in a transient (6h); "Načíst z GitHubu" forces a refresh.
  *
- * Manifest format (components.json in the repo):
+ * Manifest format (components/components.json):
  * {
+ *   "categories": [
+ *     { "key": "hero",    "label": "Hero sekce" },
+ *     { "key": "trust",   "label": "Důvěryhodnost" }
+ *   ],
  *   "components": [
- *     { "title": "Hero (s mockupem)", "file": "component-hero.html" },
- *     { "title": "Nová sekce",         "file": "component-nova.html" }
+ *     { "title": "Hero (s mockupem)", "file": "component-hero.html", "category": "hero" }
  *   ]
  * }
- * Each "file" is fetched from the same repo path: /components/<file>.
+ * - "category" on a component references a category "key".
+ * - Components with an unknown/empty category land in "Ostatní".
+ * - Category order in the UI follows the "categories" array order.
  */
 class SWDS_Library {
 
@@ -31,31 +34,85 @@ class SWDS_Library {
     const REPO   = 'paveltravnicek/sw-design-system';
     const BRANCH = 'main';
 
-    // GitHub API contents endpoint — reacts to changes immediately (ETag-based),
-    // unlike raw.githubusercontent.com which is held on a ~5 min CDN cache.
-    const API_BASE = 'https://api.github.com/repos/';
-    // Raw is the fallback (subject to up-to-5-min CDN delay).
-    const RAW_BASE      = 'https://raw.githubusercontent.com/paveltravnicek/sw-design-system/main/';
+    const API_BASE     = 'https://api.github.com/repos/';
+    const RAW_BASE     = 'https://raw.githubusercontent.com/paveltravnicek/sw-design-system/main/';
     const MANIFEST_PATH = 'components/components.json';
 
-    /** Local bundled components (fallback + offline). title => filename */
-    public static function local() {
+    /** Fallback key/label for anything without a valid category. */
+    const OTHER_KEY   = 'other';
+    const OTHER_LABEL = 'Ostatní';
+
+    /**
+     * Local bundled definition (fallback + offline).
+     * Mirrors the manifest structure: categories + components.
+     */
+    public static function local_definition() {
         return array(
-            'Hero (s mockupem)'        => 'component-hero.html',
-            'Hero (statický obrázek)'  => 'component-hero-static.html',
-            'Prvky důvěryhodnosti (3)' => 'component-trust-3col.html',
-            'Prvky důvěryhodnosti (4)' => 'component-trust-4col.html',
-            'Obsah + 2 obrázky'        => 'component-content-2img.html',
-            'CTA box'                  => 'component-cta.html',
+            'categories' => array(
+                array( 'key' => 'hero',    'label' => 'Hero sekce' ),
+                array( 'key' => 'trust',   'label' => 'Prvky důvěryhodnosti' ),
+                array( 'key' => 'content', 'label' => 'Obsah' ),
+                array( 'key' => 'cta',     'label' => 'Výzvy k akci (CTA)' ),
+            ),
+            'components' => array(
+                array( 'title' => 'Hero (s mockupem)',        'file' => 'component-hero.html',        'category' => 'hero' ),
+                array( 'title' => 'Hero (statický obrázek)',  'file' => 'component-hero-static.html', 'category' => 'hero' ),
+                array( 'title' => 'Prvky důvěryhodnosti (3)', 'file' => 'component-trust-3col.html',  'category' => 'trust' ),
+                array( 'title' => 'Prvky důvěryhodnosti (4)', 'file' => 'component-trust-4col.html',  'category' => 'trust' ),
+                array( 'title' => 'Obsah + 2 obrázky',        'file' => 'component-content-2img.html','category' => 'content' ),
+                array( 'title' => 'CTA box',                  'file' => 'component-cta.html',         'category' => 'cta' ),
+            ),
         );
     }
 
     /**
-     * Return the list of components as array of [title, code, source].
+     * Return components grouped by category, ready for the UI:
+     * array of [ 'key', 'label', 'items' => [ [title, code, source], ... ] ]
+     * Only non-empty categories are returned, in defined order, "Ostatní" last.
+     */
+    public static function grouped( $force_refresh = false ) {
+        $flat = self::components( $force_refresh );
+
+        // Determine category order + labels from the active definition.
+        $def        = self::active_definition();
+        $cat_order  = array();
+        $cat_labels = array();
+        foreach ( $def['categories'] as $c ) {
+            if ( ! empty( $c['key'] ) ) {
+                $cat_order[]            = $c['key'];
+                $cat_labels[ $c['key'] ] = isset( $c['label'] ) ? $c['label'] : $c['key'];
+            }
+        }
+        $cat_order[]                      = self::OTHER_KEY;
+        $cat_labels[ self::OTHER_KEY ]    = self::OTHER_LABEL;
+
+        // Bucket components.
+        $buckets = array();
+        foreach ( $flat as $comp ) {
+            $cat = ! empty( $comp['category'] ) && isset( $cat_labels[ $comp['category'] ] )
+                ? $comp['category']
+                : self::OTHER_KEY;
+            $buckets[ $cat ][] = $comp;
+        }
+
+        // Emit in order, skipping empties.
+        $out = array();
+        foreach ( $cat_order as $key ) {
+            if ( empty( $buckets[ $key ] ) ) {
+                continue;
+            }
+            $out[] = array(
+                'key'   => $key,
+                'label' => $cat_labels[ $key ],
+                'items' => $buckets[ $key ],
+            );
+        }
+        return $out;
+    }
+
+    /**
+     * Flat list of components: [ title, code, source, category ].
      * source = 'remote' | 'local'.
-     *
-     * On force-refresh we fetch BEFORE clearing the cache, so a failed
-     * fetch (e.g. GitHub rate limit) doesn't wipe a good cached list.
      */
     public static function components( $force_refresh = false ) {
         if ( $force_refresh ) {
@@ -64,12 +121,10 @@ class SWDS_Library {
                 set_transient( self::TRANSIENT, $remote, self::TTL );
                 return $remote;
             }
-            // Fetch failed — keep whatever we had; if nothing, fall through to local.
             $cached = get_transient( self::TRANSIENT );
             return ( is_array( $cached ) && ! empty( $cached ) ) ? $cached : self::load_local();
         }
 
-        // Normal load: cached remote first.
         $cached = get_transient( self::TRANSIENT );
         if ( is_array( $cached ) && ! empty( $cached ) ) {
             return $cached;
@@ -84,14 +139,22 @@ class SWDS_Library {
         return self::load_local();
     }
 
+    /**
+     * The category definition currently in effect. Prefer the remote
+     * manifest's categories (cached alongside components); fall back to local.
+     */
+    private static function active_definition() {
+        $cats = get_transient( self::TRANSIENT . '_cats' );
+        if ( is_array( $cats ) && ! empty( $cats ) ) {
+            return array( 'categories' => $cats );
+        }
+        return self::local_definition();
+    }
 
     /**
-     * Fetch one path from the repo as a string.
-     * Tries the GitHub API contents endpoint first (reacts to commits
-     * immediately), then falls back to the raw CDN. Returns string|null.
+     * Fetch one path from the repo as a string (API first, raw fallback).
      */
     private static function fetch_file( $path ) {
-        // 1) GitHub API contents — base64 in JSON, ETag-cached (fresh).
         $api_url = self::API_BASE . self::REPO . '/contents/' . $path . '?ref=' . self::BRANCH;
         $res = wp_remote_get( $api_url, array(
             'timeout' => 8,
@@ -110,8 +173,6 @@ class SWDS_Library {
             }
         }
 
-        // 2) Fallback: raw CDN (may lag up to ~5 min). Cache-bust query param
-        //    doesn't help raw (keys by path only), but the request is harmless.
         $raw = wp_remote_get( self::RAW_BASE . $path, array(
             'timeout' => 8,
             'headers' => array( 'User-Agent' => 'SW-Design-System' ),
@@ -127,8 +188,8 @@ class SWDS_Library {
     }
 
     /**
-     * Fetch the manifest + each component file from GitHub.
-     * Returns array of components or empty array on any failure.
+     * Fetch manifest + component files from GitHub. Also caches the category
+     * definition. Returns flat component array or empty on failure.
      */
     private static function fetch_remote() {
         $manifest_raw = self::fetch_file( self::MANIFEST_PATH );
@@ -140,13 +201,27 @@ class SWDS_Library {
             return array();
         }
 
+        // Cache category definition (sanitized) for grouping.
+        if ( ! empty( $manifest['categories'] ) && is_array( $manifest['categories'] ) ) {
+            $cats = array();
+            foreach ( $manifest['categories'] as $c ) {
+                if ( empty( $c['key'] ) ) { continue; }
+                $cats[] = array(
+                    'key'   => sanitize_key( $c['key'] ),
+                    'label' => isset( $c['label'] ) ? sanitize_text_field( $c['label'] ) : $c['key'],
+                );
+            }
+            if ( ! empty( $cats ) ) {
+                set_transient( self::TRANSIENT . '_cats', $cats, self::TTL );
+            }
+        }
+
         $out = array();
         foreach ( $manifest['components'] as $item ) {
             if ( empty( $item['file'] ) || empty( $item['title'] ) ) {
                 continue;
             }
             $file = ltrim( (string) $item['file'], '/' );
-            // Only allow our component filenames (no path traversal).
             if ( ! preg_match( '/^[a-z0-9\-]+\.html$/i', $file ) ) {
                 continue;
             }
@@ -155,24 +230,27 @@ class SWDS_Library {
                 continue;
             }
             $out[] = array(
-                'title'  => sanitize_text_field( $item['title'] ),
-                'code'   => $code,
-                'source' => 'remote',
+                'title'    => sanitize_text_field( $item['title'] ),
+                'code'     => $code,
+                'source'   => 'remote',
+                'category' => ! empty( $item['category'] ) ? sanitize_key( $item['category'] ) : self::OTHER_KEY,
             );
         }
         return $out;
     }
 
-    /** Load local bundled component files. */
+    /** Load local bundled component files (with categories). */
     private static function load_local() {
+        $def = self::local_definition();
         $out = array();
-        foreach ( self::local() as $title => $file ) {
-            $path = SWDS_DIR . 'components/' . $file;
+        foreach ( $def['components'] as $item ) {
+            $path = SWDS_DIR . 'components/' . $item['file'];
             if ( file_exists( $path ) ) {
                 $out[] = array(
-                    'title'  => $title,
-                    'code'   => file_get_contents( $path ),
-                    'source' => 'local',
+                    'title'    => $item['title'],
+                    'code'     => file_get_contents( $path ),
+                    'source'   => 'local',
+                    'category' => ! empty( $item['category'] ) ? $item['category'] : self::OTHER_KEY,
                 );
             }
         }
