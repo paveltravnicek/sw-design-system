@@ -3,7 +3,7 @@
  * Plugin Name:       SW Design System
  * Plugin URI:        https://smart-websites.cz/
  * Description:       Konfigurovatelný design systém pro weby Smart Websites. Nastavte barvy, dark mode, tvarosloví, stíny a animace v jednom místě — plugin z toho vygeneruje CSS. Obsahuje knihovnu komponent a nápovědu.
- * Version:           1.1.3
+ * Version:           1.0
  * Author:            Smart Websites
  * Author URI:        https://smart-websites.cz/
  * License:           GPL-2.0-or-later
@@ -34,7 +34,7 @@ if ( file_exists( __DIR__ . '/plugin-update-checker/plugin-update-checker.php' )
     }
 }
 
-define( 'SWDS_VERSION', '1.1.3' );
+define( 'SWDS_VERSION', '1.0' );
 define( 'SWDS_FILE', __FILE__ );
 define( 'SWDS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SWDS_URL', plugin_dir_url( __FILE__ ) );
