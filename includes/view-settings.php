@@ -10,8 +10,8 @@ $notice_map = array(
     'preset'       => array( 'ok',  'Preset aplikován. Doladit hodnoty můžete níže a uložit.' ),
     'reset'        => array( 'ok',  'Nastavení vráceno na výchozí hodnoty.' ),
     'imported'     => array( 'ok',  'Nastavení naimportováno.' ),
-    'library'      => array( 'ok',  'Knihovna komponent načtena z GitHubu.' ),
-    'library_local' => array( 'err', 'GitHub se teď nepodařilo načíst (limit/dostupnost). Zobrazují se vestavěné komponenty — zkuste to za chvíli znovu.' ),
+    'library'      => array( 'ok',  'Seznam sekcí byl aktualizován.' ),
+    'library_local' => array( 'err', 'Nejnovější sekce se teď nepodařilo načíst. Zobrazují se vestavěné sekce — zkuste to prosím za chvíli znovu.' ),
     'import_error' => array( 'err', 'Import se nezdařil — vložený text není platný JSON.' ),
 );
 $export_json = wp_json_encode( $s, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
@@ -190,11 +190,11 @@ $tabs['library'] = array( 'title' => 'Komponenty', 'icon' => 'block-default' );
         }
         ?>
         <div class="swds-panel" data-panel="library">
-            <p class="swds-intro">Hotové komponenty rozdělené do kategorií. Zkopírujte HTML a vložte do LiveCanvas (Add Section → prázdná → Edit Code), nebo do Edit Main HTML. Styl se načte automaticky z design systému. <strong>Komponenty i kategorie se spravují na GitHubu</strong> v souboru <code>components.json</code> — bez nutnosti aktualizovat plugin. Klikem na název kategorie ji sbalíte/rozbalíte.</p>
+            <p class="swds-intro">Hotové sekce rozdělené do kategorií. U vybrané sekce klikněte na <strong>Kopírovat HTML</strong> a vložte ji v editoru stránky (LiveCanvas → přidat sekci → vložit kód). Vzhled — barvy, fonty i styl — se nastaví automaticky podle tohoto design systému. Klikem na název kategorie ji sbalíte nebo rozbalíte.</p>
 
             <p style="margin:-8px 0 18px;">
-                <button type="submit" name="swds_action" value="refresh_library" class="button">↻ Načíst komponenty z GitHubu</button>
-                <span class="swds-help" style="margin-left:10px;">Zdroj: <?php echo $has_remote ? 'GitHub (aktuální)' : 'lokální (vestavěné v pluginu)'; ?> · komponent: <?php echo (int) $total; ?></span>
+                <button type="submit" name="swds_action" value="refresh_library" class="button">↻ Načíst nejnovější sekce</button>
+                <span class="swds-help" style="margin-left:10px;">Sekcí k dispozici: <?php echo (int) $total; ?></span>
             </p>
 
             <?php $i = 0; foreach ( $groups as $gi => $g ) :

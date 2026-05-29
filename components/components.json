@@ -8,8 +8,8 @@
   "components": [
     { "title": "Hero (s mockupem)",        "file": "component-hero.html",        "category": "hero" },
     { "title": "Hero (statický obrázek)",  "file": "component-hero-static.html", "category": "hero" },
-    { "title": "Prvky důvěryhodnosti (3 sloupce)", "file": "component-trust-3col.html",  "category": "trust" },
-    { "title": "Prvky důvěryhodnosti (4 sloupce)", "file": "component-trust-4col.html",  "category": "trust" },
+    { "title": "Prvky důvěryhodnosti (3)", "file": "component-trust-3col.html",  "category": "trust" },
+    { "title": "Prvky důvěryhodnosti (4)", "file": "component-trust-4col.html",  "category": "trust" },
     { "title": "Obsah + 2 obrázky",        "file": "component-content-2img.html","category": "content" },
     { "title": "CTA box",                   "file": "component-cta.html",         "category": "cta" }
   ]

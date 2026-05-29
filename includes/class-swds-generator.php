@@ -210,9 +210,9 @@ class SWDS_Generator {
 
         // Layout
         $spacing = array(
-            'compact' => 'clamp(2.5rem,5vw,4rem)',
-            'normal'  => 'clamp(3.5rem,7vw,6rem)',
-            'airy'    => 'clamp(5rem,9vw,9rem)',
+            'compact' => 'clamp(2rem,3.5vw,3rem)',
+            'normal'  => 'clamp(2.75rem,5vw,4.25rem)',
+            'airy'    => 'clamp(4rem,7vw,7rem)',
         );
         $vars['--sw-section-py'] = $spacing[ $s['section_spacing'] ] ?? $spacing['normal'];
 

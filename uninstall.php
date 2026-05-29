@@ -7,6 +7,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 delete_option( 'swds_settings' );
+delete_option( 'swds_version' );
 
 // Remove generated CSS file + directory.
 $up  = wp_upload_dir();

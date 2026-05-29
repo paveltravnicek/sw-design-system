@@ -50,7 +50,7 @@
   --sw-h-cta:       clamp(2rem, 5vw, 4.4rem);
 
   /* Layout */
-  --sw-section-py:  clamp(3.5rem, 7vw, 6rem);
+  --sw-section-py:  clamp(2.75rem, 5vw, 4.25rem);
 
   /* Generator-driven tokens (defaults; overridden by sw-tokens.css) */
   --sw-bg-angle:        135deg;
@@ -221,15 +221,20 @@
   transform: translateY(var(--sw-reveal-distance));
   transition: opacity var(--sw-reveal-duration) ease, transform var(--sw-reveal-duration) ease;
 }
-.sw-anim-on.is-visible .sw-reveal-item { opacity: 1; transform: translateY(0); }
-.sw-anim-on.is-visible .sw-reveal-item:nth-child(2) { transition-delay: .12s; }
-.sw-anim-on.is-visible .sw-reveal-item:nth-child(3) { transition-delay: .24s; }
-.sw-anim-on.is-visible .sw-reveal-item:nth-child(4) { transition-delay: .36s; }
+.sw-anim-on .sw-reveal-item.is-in { opacity: 1; transform: translateY(0); }
+/* subtle stagger when several items reveal together (same row) */
+.sw-anim-on .sw-reveal-item:nth-child(2).is-in { transition-delay: .08s; }
+.sw-anim-on .sw-reveal-item:nth-child(3).is-in { transition-delay: .16s; }
+.sw-anim-on .sw-reveal-item:nth-child(4).is-in { transition-delay: .24s; }
 
 
 /* ================================================================
    COMPONENT: HERO (with static dynamic image)
    ================================================================ */
+/* Hero: clip horizontal overflow only (the phone sticks out to the right).
+   overflow-x: clip keeps vertical shadows intact, unlike overflow:hidden. */
+.sw-hero { overflow-x: clip; }
+
 .sw-hero-grid {
   display: grid;
   grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);

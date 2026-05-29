@@ -18,19 +18,41 @@
   const noMotion   = window.matchMedia('(prefers-reduced-motion: reduce)');
   const parallaxOK = window.matchMedia('(min-width: 992px) and (pointer: fine)');
 
-  /* ---------- Reveal on enter ---------- */
+  /* ---------- Reveal on enter ----------
+     Each [data-sw-reveal] container gets .sw-anim-on (hides its
+     .sw-reveal-item children). We observe each ITEM individually and add
+     .is-visible to its container-scope when the item scrolls into view, so
+     items animate exactly when they personally reach the viewport —
+     regardless of how tall the section is. */
   const revealEls = document.querySelectorAll('[data-sw-reveal]');
-  if (revealEls.length && 'IntersectionObserver' in window && !noMotion.matches) {
-    revealEls.forEach(el => el.classList.add('sw-anim-on'));
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
-        }
+  if (revealEls.length) {
+    if (noMotion.matches || !('IntersectionObserver' in window)) {
+      revealEls.forEach(el => {
+        el.classList.add('sw-anim-on', 'is-visible');
+        el.querySelectorAll('.sw-reveal-item').forEach(i => i.classList.add('is-in'));
       });
-    }, { threshold: .18 });
-    revealEls.forEach(el => io.observe(el));
+    } else {
+      const items = [];
+      revealEls.forEach(el => {
+        el.classList.add('sw-anim-on');
+        el.querySelectorAll('.sw-reveal-item').forEach(i => items.push(i));
+      });
+
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, {
+        root: null,
+        threshold: 0,
+        rootMargin: '0px 0px -5% 0px'  // reveal a bit before the very edge
+      });
+
+      items.forEach(i => io.observe(i));
+    }
   }
 
   /* ---------- Parallax stages (any number per page) ---------- */
