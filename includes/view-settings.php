@@ -11,6 +11,7 @@ $notice_map = array(
     'reset'        => array( 'ok',  'Nastavení vráceno na výchozí hodnoty.' ),
     'imported'     => array( 'ok',  'Nastavení naimportováno.' ),
     'library'      => array( 'ok',  'Knihovna komponent načtena z GitHubu.' ),
+    'library_local' => array( 'err', 'GitHub se teď nepodařilo načíst (limit/dostupnost). Zobrazují se vestavěné komponenty — zkuste to za chvíli znovu.' ),
     'import_error' => array( 'err', 'Import se nezdařil — vložený text není platný JSON.' ),
 );
 $export_json = wp_json_encode( $s, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
@@ -161,7 +162,7 @@ $tabs['library'] = array( 'title' => 'Komponenty', 'icon' => 'block-default' );
 
             <div class="swds-help-block">
                 <h3>1. Plátno (pozadí)</h3>
-                <p>Aby společné modré pozadí prosvítalo skrz sekce, musí být obal s třídou <code>sw-canvas</code> — buď na <code>&lt;body&gt;</code> (přes téma / Customizer), nebo obalte sekce v Edit Main HTML do <code>&lt;div class="sw-canvas"&gt;…&lt;/div&gt;</code>. Bez něj jsou sekce průhledné.</p>
+                <p>Aby společné modré pozadí prosvítalo skrz sekce, musí být obal s třídou <code>sw-canvas</code> — buď na <code>&lt;body&gt;</code> (přes téma / Customizer), nebo obalte sekce v Edit Main HTML do <code>&lt;div class="sw-canvas"&gt;…&lt;/div&gt;</code>. Bez něj jsou sekce průhledné. Výška se řídí obsahem — můžete tak obalit i jednu krátkou sekci, aniž by se roztáhla. Pokud chcete, aby pozadí pokrylo celý monitor i u krátké stránky, přidejte <code>sw-canvas--full</code> (tj. <code>class="sw-canvas sw-canvas--full"</code>) na obal celé stránky.</p>
             </div>
             <div class="swds-help-block">
                 <h3>2. Editovatelné texty</h3>

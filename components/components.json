@@ -1,10 +1,10 @@
 {
   "components": [
-    { "title": "Hero sekce s dynamickým mockupem", "file": "component-hero.html" },
-    { "title": "Hero sekce se statickým mockupem)", "file": "component-hero-static.html" },
-    { "title": "Prvky důvěryhodnosti (3 dlaždice)", "file": "component-trust-3col.html" },
-    { "title": "Prvky důvěryhodnosti (4 dlaždice)", "file": "component-trust-4col.html" },
-    { "title": "Textový obsah vlevo + 2 obrázky vpravo", "file": "component-content-2img.html" },
-    { "title": "CTA box", "file": "component-cta.html" }
+    { "title": "Hero (s mockupem)",        "file": "component-hero.html" },
+    { "title": "Hero (statický obrázek)",  "file": "component-hero-static.html" },
+    { "title": "Prvky důvěryhodnosti (3)", "file": "component-trust-3col.html" },
+    { "title": "Prvky důvěryhodnosti (4)", "file": "component-trust-4col.html" },
+    { "title": "Obsah + 2 obrázky",        "file": "component-content-2img.html" },
+    { "title": "CTA box",                   "file": "component-cta.html" }
   ]
 }

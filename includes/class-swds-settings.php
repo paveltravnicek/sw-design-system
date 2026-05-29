@@ -77,9 +77,13 @@ class SWDS_Settings {
                 break;
 
             case 'refresh_library':
-                SWDS_Library::components( true ); // force refresh transient
+                $list = SWDS_Library::components( true ); // force refresh
+                $ok   = false;
+                foreach ( (array) $list as $c ) {
+                    if ( isset( $c['source'] ) && 'remote' === $c['source'] ) { $ok = true; break; }
+                }
                 $redirect = add_query_arg(
-                    array( 'page' => self::SLUG, 'swds_notice' => 'library' ),
+                    array( 'page' => self::SLUG, 'swds_notice' => $ok ? 'library' : 'library_local' ),
                     admin_url( 'themes.php' )
                 );
                 wp_safe_redirect( $redirect );

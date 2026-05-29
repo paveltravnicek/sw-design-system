@@ -204,6 +204,10 @@ class SWDS_Generator {
         $vars['--sw-reveal-distance'] = $motionOn ? $rDist : '0px';
         $vars['--sw-reveal-duration'] = $motionOn ? $rDur  : '.001ms';
 
+        // Screenshot scroll: animate only when motion is on (paused = 0s).
+        $vars['--sw-scroll-play']     = $motionOn ? 'running' : 'paused';
+        $vars['--sw-scroll-duration'] = '15s';
+
         // Layout
         $spacing = array(
             'compact' => 'clamp(2.5rem,5vw,4rem)',
