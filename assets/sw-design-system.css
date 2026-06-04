@@ -76,6 +76,77 @@
 
 
 /* ================================================================
+   1b. SURFACE SYSTEM
+   Lets any section be light or dark independently of the page.
+   Put one of these on a .sw-section (or its wrapper):
+
+     .sw-surface--dark   → always dark/glass  (e.g. hero)
+     .sw-surface--light  → always light cards + dark text
+     .sw-surface--auto   → follows the site: light normally,
+                            dark when [data-bs-theme="dark"] is set
+
+   Components read the surface tokens below, so they all adapt the
+   same way without per-component code. --auto is the implied default
+   if you wrap a section in .sw-surface--auto.
+   ================================================================ */
+
+/* The DARK token set (matches the original look). */
+.sw-surface--dark {
+  --sw-text:         #ffffff;
+  --sw-text-muted:   rgba(255, 255, 255, .72);
+  --sw-card-bg:      linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  --sw-card-border:  rgba(255, 255, 255, .13);
+  --sw-card-blur:    14px;
+  --sw-shadow-card:  0 24px 80px rgba(0, 0, 0, .25);
+  --sw-surface-hover-border: rgba(255, 255, 255, .28);
+  color-scheme: dark;
+}
+
+/* The LIGHT token set. */
+.sw-surface--light {
+  --sw-text:         var(--bs-body-color, #1a2233);
+  --sw-text-muted:   color-mix(in srgb, var(--bs-body-color, #333) 62%, transparent);
+  --sw-card-bg:      #ffffff;
+  --sw-card-border:  #e6ebf2;
+  --sw-card-blur:    0px;
+  --sw-shadow-card:  0 1px 2px rgba(16,42,80,.04), 0 16px 44px rgba(16,42,80,.09);
+  --sw-surface-hover-border: color-mix(in srgb, var(--sw-blue) 40%, #e6ebf2);
+  color-scheme: light;
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-surface--light { --sw-text-muted: #5b6470; --sw-surface-hover-border: var(--sw-blue); }
+}
+
+/* AUTO: light by default, dark when the site is in dark mode. */
+.sw-surface--auto {
+  --sw-text:         var(--bs-body-color, #1a2233);
+  --sw-text-muted:   color-mix(in srgb, var(--bs-body-color, #333) 62%, transparent);
+  --sw-card-bg:      #ffffff;
+  --sw-card-border:  #e6ebf2;
+  --sw-card-blur:    0px;
+  --sw-shadow-card:  0 1px 2px rgba(16,42,80,.04), 0 16px 44px rgba(16,42,80,.09);
+  --sw-surface-hover-border: color-mix(in srgb, var(--sw-blue) 40%, #e6ebf2);
+  color-scheme: light;
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-surface--auto { --sw-text-muted: #5b6470; --sw-surface-hover-border: var(--sw-blue); }
+}
+[data-bs-theme="dark"] .sw-surface--auto {
+  --sw-text:         var(--bs-body-color, #f1f5f9);
+  --sw-text-muted:   color-mix(in srgb, var(--bs-body-color, #f1f5f9) 65%, transparent);
+  --sw-card-bg:      rgba(255,255,255,.06);
+  --sw-card-border:  rgba(255,255,255,.14);
+  --sw-card-blur:    14px;
+  --sw-shadow-card:  0 24px 70px rgba(0,0,0,.45);
+  --sw-surface-hover-border: rgba(255,255,255,.28);
+  color-scheme: dark;
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  [data-bs-theme="dark"] .sw-surface--auto { --sw-text-muted: rgba(241,245,249,.7); }
+}
+
+
+/* ================================================================
    2. CANVAS — unified gradient background for the whole page.
       Put class="sw-canvas" on <body>, or wrap your SW sections
       in <div class="sw-canvas">. Sections themselves are transparent.
@@ -549,9 +620,9 @@
 
 /* ================================================================
    COMPONENT: PRICING (3 columns, one featured)
-   Light variant (.sw-pricing--light): light cards + dark text, for use
-   on a light section background. Dark/glass cards remain the default if
-   the --light modifier is omitted (use on .sw-canvas).
+   Surface-aware: colors come from .sw-surface--light/dark/auto on the
+   section. Featured card tints the active surface; works in any mode.
+   
    ================================================================ */
 .sw-pricing-intro { text-align: center; max-width: 46rem; margin: 0 auto clamp(2rem, 4vw, 3rem); }
 .sw-pricing-title { margin: 0 0 .8rem; }
@@ -592,20 +663,7 @@
 .sw-price-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 32px 90px rgba(0,0,0,.4);
-  border-color: rgba(255,255,255,.28);
-}
-
-.sw-price-card--featured {
-  background:
-    linear-gradient(180deg, rgba(0,150,226,.22), rgba(0,150,226,.06)),
-    var(--sw-card-bg);
-  border-color: color-mix(in srgb, var(--sw-blue) 55%, transparent);
-  box-shadow: 0 28px 80px rgba(0,0,0,.4), 0 0 60px var(--sw-blue-glow, rgba(0,150,226,.32));
-  transform: translateY(-12px);
-}
-.sw-price-card--featured:hover { transform: translateY(-18px); }
-@supports not (background: color-mix(in srgb, red, blue)) {
-  .sw-price-card--featured { border-color: var(--sw-blue); }
+  border-color: var(--sw-surface-hover-border, rgba(255,255,255,.28));
 }
 
 .sw-price-badge {
@@ -648,83 +706,21 @@
 
 .sw-price-btn { width: 100%; margin-top: auto; }
 
-/* ---------- LIGHT VARIANT ---------- */
-.sw-pricing--light {
-  --sw-price-ink: var(--bs-body-color, #333333);   /* inherit theme body color */
-  --sw-price-ink-muted: color-mix(in srgb, var(--bs-body-color, #333) 65%, transparent);
-  --sw-price-card-bg: #ffffff;
-  --sw-price-card-border: #e6ebf2;
-}
-@supports not (background: color-mix(in srgb, red, blue)) {
-  .sw-pricing--light { --sw-price-ink-muted: #5b6470; }
-}
-.sw-pricing--light .sw-pricing-title { color: var(--sw-price-ink); }
-.sw-pricing--light .sw-pricing-subtitle { color: var(--sw-price-ink-muted); }
-
-.sw-pricing--light .sw-price-card {
-  background: var(--sw-price-card-bg);
-  border-color: var(--sw-price-card-border);
-  box-shadow: 0 1px 2px rgba(16,42,80,.04), 0 18px 50px rgba(16,42,80,.10);
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-}
-.sw-pricing--light .sw-price-card:hover {
-  border-color: color-mix(in srgb, var(--sw-blue) 40%, var(--sw-price-card-border));
-  box-shadow: 0 1px 2px rgba(16,42,80,.05), 0 28px 70px rgba(16,42,80,.16);
-}
-
-.sw-pricing--light .sw-price-card--featured {
+/* Featured card: brand-tinted on top of whatever the surface card bg is. */
+.sw-price-card--featured {
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--sw-blue) 10%, #fff), #fff);
-  border-color: color-mix(in srgb, var(--sw-blue) 45%, transparent);
-  box-shadow: 0 1px 2px rgba(16,42,80,.05), 0 30px 75px color-mix(in srgb, var(--sw-blue) 25%, transparent);
+    linear-gradient(180deg, color-mix(in srgb, var(--sw-blue) 14%, transparent), transparent),
+    var(--sw-card-bg);
+  border-color: color-mix(in srgb, var(--sw-blue) 50%, transparent);
+  box-shadow: var(--sw-shadow-card), 0 0 60px var(--sw-blue-glow);
+  transform: translateY(-12px);
 }
+.sw-price-card--featured:hover { transform: translateY(-18px); }
 @supports not (background: color-mix(in srgb, red, blue)) {
-  .sw-pricing--light .sw-price-card--featured { background: #f3f9ff; border-color: var(--sw-blue); }
+  .sw-price-card--featured { border-color: var(--sw-blue); }
 }
 
-.sw-pricing--light .sw-price-name { color: var(--sw-price-ink); }
-.sw-pricing--light .sw-price-desc,
-.sw-pricing--light .sw-price-feats li { color: var(--sw-price-ink); }
-.sw-pricing--light .sw-price-desc { color: var(--sw-price-ink-muted); }
-.sw-pricing--light .sw-price-value { border-top-color: var(--sw-price-card-border); }
-.sw-pricing--light .sw-price-check { background: color-mix(in srgb, var(--sw-blue) 14%, transparent); }
-.sw-pricing--light .sw-price-check svg { fill: var(--sw-blue); }
-@supports not (background: color-mix(in srgb, red, blue)) {
-  .sw-pricing--light .sw-price-check { background: rgba(0,150,226,.14); }
-}
-
-/* ---------- DARK MODE ----------
-   When the site is in dark mode, the light pricing variant flips back to
-   dark/glass cards. Global and always-on (part of the design system). */
-[data-bs-theme="dark"] .sw-pricing--light {
-  --sw-price-ink: var(--bs-body-color, #f1f5f9);
-  --sw-price-ink-muted: color-mix(in srgb, var(--bs-body-color, #f1f5f9) 65%, transparent);
-  --sw-price-card-bg: rgba(255,255,255,.06);
-  --sw-price-card-border: rgba(255,255,255,.14);
-}
-@supports not (background: color-mix(in srgb, red, blue)) {
-  [data-bs-theme="dark"] .sw-pricing--light { --sw-price-ink-muted: rgba(241,245,249,.7); }
-}
-[data-bs-theme="dark"] .sw-pricing--light .sw-price-card {
-  background: var(--sw-price-card-bg);
-  border-color: var(--sw-price-card-border);
-  box-shadow: 0 24px 70px rgba(0,0,0,.45);
-  -webkit-backdrop-filter: blur(14px);
-          backdrop-filter: blur(14px);
-}
-[data-bs-theme="dark"] .sw-pricing--light .sw-price-card:hover {
-  border-color: rgba(255,255,255,.28);
-  box-shadow: 0 32px 90px rgba(0,0,0,.55);
-}
-[data-bs-theme="dark"] .sw-pricing--light .sw-price-card--featured {
-  background:
-    linear-gradient(180deg, rgba(0,150,226,.22), rgba(0,150,226,.06)),
-    rgba(255,255,255,.06);
-  border-color: color-mix(in srgb, var(--sw-blue) 55%, transparent);
-}
-@supports not (background: color-mix(in srgb, red, blue)) {
-  [data-bs-theme="dark"] .sw-pricing--light .sw-price-card--featured { border-color: var(--sw-blue); }
-}
+.sw-price-card:hover { border-color: var(--sw-surface-hover-border, rgba(255,255,255,.28)); }
 
 @media (max-width: 767.98px) {
   .sw-pricing-grid { grid-template-columns: 1fr; max-width: 480px; margin-inline: auto; }
@@ -735,8 +731,8 @@
 
 /* ================================================================
    COMPONENT: PROCESS / STEPS (numbered, 2 columns)
-   Light variant (.sw-process--light) for light section backgrounds;
-   dark/glass by default + automatic dark-mode handling.
+   Surface-aware via .sw-surface--light/dark/auto on the section.
+   
    ================================================================ */
 .sw-process-intro { max-width: 70ch; margin: 0 0 clamp(2rem, 4vw, 3rem); }
 .sw-process-title { margin: 0 0 1rem; }
@@ -764,7 +760,7 @@
 }
 .sw-step:hover {
   transform: translateY(-4px);
-  border-color: rgba(255,255,255,.28);
+  border-color: var(--sw-surface-hover-border, rgba(255,255,255,.28));
   box-shadow: 0 28px 80px rgba(0,0,0,.4);
 }
 
@@ -782,48 +778,6 @@
 .sw-step-title { margin: .1rem 0 .5rem; font-size: 1.15rem; font-weight: 750; letter-spacing: -.01em; color: var(--sw-text); text-wrap: balance; }
 .sw-step-body p { margin: 0; color: var(--sw-text-muted); font-size: .98rem; line-height: 1.55; text-wrap: pretty; }
 
-/* ---------- LIGHT VARIANT ---------- */
-.sw-process--light {
-  --sw-step-ink: var(--bs-body-color, #333333);
-  --sw-step-ink-muted: color-mix(in srgb, var(--bs-body-color, #333) 65%, transparent);
-  --sw-step-card-bg: #ffffff;
-  --sw-step-card-border: #e6ebf2;
-}
-@supports not (background: color-mix(in srgb, red, blue)) {
-  .sw-process--light { --sw-step-ink-muted: #5b6470; }
-}
-.sw-process--light .sw-process-title { color: var(--sw-step-ink); }
-.sw-process--light .sw-process-lead p { color: var(--sw-step-ink-muted); }
-.sw-process--light .sw-step {
-  background: var(--sw-step-card-bg);
-  border-color: var(--sw-step-card-border);
-  box-shadow: 0 1px 2px rgba(16,42,80,.04), 0 16px 44px rgba(16,42,80,.09);
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-}
-.sw-process--light .sw-step:hover {
-  border-color: color-mix(in srgb, var(--sw-blue) 40%, var(--sw-step-card-border));
-  box-shadow: 0 1px 2px rgba(16,42,80,.05), 0 24px 60px rgba(16,42,80,.15);
-}
-.sw-process--light .sw-step-title { color: var(--sw-step-ink); }
-.sw-process--light .sw-step-body p { color: var(--sw-step-ink-muted); }
-
-/* ---------- DARK MODE (light variant flips back to glass) ---------- */
-[data-bs-theme="dark"] .sw-process--light {
-  --sw-step-ink: var(--bs-body-color, #f1f5f9);
-  --sw-step-ink-muted: color-mix(in srgb, var(--bs-body-color, #f1f5f9) 65%, transparent);
-  --sw-step-card-bg: rgba(255,255,255,.06);
-  --sw-step-card-border: rgba(255,255,255,.14);
-}
-@supports not (background: color-mix(in srgb, red, blue)) {
-  [data-bs-theme="dark"] .sw-process--light { --sw-step-ink-muted: rgba(241,245,249,.7); }
-}
-[data-bs-theme="dark"] .sw-process--light .sw-step {
-  background: var(--sw-step-card-bg);
-  border-color: var(--sw-step-card-border);
-  box-shadow: 0 24px 70px rgba(0,0,0,.45);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-}
-
 @media (max-width: 767.98px) {
   .sw-process-grid { grid-template-columns: 1fr; }
 }
@@ -831,8 +785,8 @@
 
 /* ================================================================
    COMPONENT: FAQ (accordion)
-   Light variant (.sw-faq--light) for light backgrounds; dark/glass by
-   default + dark-mode handling. Toggle driven by JS (.is-open) + aria.
+   Surface-aware via .sw-surface--light/dark/auto on the section.
+   Toggle driven by JS (.is-open) + aria-expanded.
    ================================================================ */
 .sw-faq-intro { max-width: 70ch; margin: 0 0 clamp(1.75rem, 3.5vw, 2.5rem); }
 .sw-faq-title { margin: 0 0 1rem; }
@@ -930,45 +884,6 @@
 .sw-faq-a-inner { padding: 0 1.4rem 1.25rem; }
 .sw-faq-a-inner p { margin: 0; color: var(--sw-text-muted); font-size: 1rem; line-height: 1.6; text-wrap: pretty; }
 .sw-faq-a-inner :is(p) + p { margin-top: .75rem; }
-
-/* ---------- LIGHT VARIANT ---------- */
-.sw-faq--light {
-  --sw-faq-ink: var(--bs-body-color, #333333);
-  --sw-faq-ink-muted: color-mix(in srgb, var(--bs-body-color, #333) 65%, transparent);
-  --sw-faq-card-bg: #ffffff;
-  --sw-faq-card-border: #e6ebf2;
-}
-@supports not (background: color-mix(in srgb, red, blue)) {
-  .sw-faq--light { --sw-faq-ink-muted: #5b6470; }
-}
-.sw-faq--light .sw-faq-title { color: var(--sw-faq-ink); }
-.sw-faq--light .sw-faq-lead p { color: var(--sw-faq-ink-muted); }
-.sw-faq--light .sw-faq-item {
-  background: var(--sw-faq-card-bg);
-  border-color: var(--sw-faq-card-border);
-  box-shadow: 0 1px 2px rgba(16,42,80,.04), 0 12px 32px rgba(16,42,80,.07);
-  -webkit-backdrop-filter: none; backdrop-filter: none;
-}
-.sw-faq--light .sw-faq-trigger { color: var(--sw-faq-ink); }
-.sw-faq--light .sw-faq-item.is-open .sw-faq-trigger { color: var(--sw-blue); }
-.sw-faq--light .sw-faq-a-inner p { color: var(--sw-faq-ink-muted); }
-
-/* ---------- DARK MODE (light variant → glass) ---------- */
-[data-bs-theme="dark"] .sw-faq--light {
-  --sw-faq-ink: var(--bs-body-color, #f1f5f9);
-  --sw-faq-ink-muted: color-mix(in srgb, var(--bs-body-color, #f1f5f9) 65%, transparent);
-  --sw-faq-card-bg: rgba(255,255,255,.06);
-  --sw-faq-card-border: rgba(255,255,255,.14);
-}
-@supports not (background: color-mix(in srgb, red, blue)) {
-  [data-bs-theme="dark"] .sw-faq--light { --sw-faq-ink-muted: rgba(241,245,249,.7); }
-}
-[data-bs-theme="dark"] .sw-faq--light .sw-faq-item {
-  background: var(--sw-faq-card-bg);
-  border-color: var(--sw-faq-card-border);
-  box-shadow: 0 18px 50px rgba(0,0,0,.4);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-}
 
 /* Below lg: single column, hide the decorative visual */
 @media (max-width: 991.98px) {

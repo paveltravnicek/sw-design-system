@@ -165,19 +165,29 @@ $tabs['library'] = array( 'title' => 'Komponenty', 'icon' => 'block-default' );
                 <p>Aby společné modré pozadí prosvítalo skrz sekce, musí být obal s třídou <code>sw-canvas</code> — buď na <code>&lt;body&gt;</code> (přes téma / Customizer), nebo obalte sekce v Edit Main HTML do <code>&lt;div class="sw-canvas"&gt;…&lt;/div&gt;</code>. Bez něj jsou sekce průhledné. Výška se řídí obsahem — můžete tak obalit i jednu krátkou sekci, aniž by se roztáhla. Pokud chcete, aby pozadí pokrylo celý monitor i u krátké stránky, přidejte <code>sw-canvas--full</code> (tj. <code>class="sw-canvas sw-canvas--full"</code>) na obal celé stránky.</p>
             </div>
             <div class="swds-help-block">
-                <h3>2. Editovatelné texty</h3>
+                <h3>2. Světlý / tmavý režim sekce</h3>
+                <p>Každá sekce může být světlá nebo tmavá nezávisle na pozadí stránky. Stačí přidat jednu třídu na sekci:</p>
+                <p style="margin-top:.5rem;">
+                  <code>sw-surface--auto</code> — sleduje web: ve světlém režimu světlá, v tmavém (dark mode) tmavá. <strong>Nejčastější volba.</strong><br>
+                  <code>sw-surface--dark</code> — vždy tmavá (skleněné karty, světlý text). Typicky hero.<br>
+                  <code>sw-surface--light</code> — vždy světlá, i když je web v tmavém režimu.
+                </p>
+                <p style="margin-top:.5rem;">Komponenty z knihovny už mají vhodnou třídu přednastavenou — hero a podobné jsou <code>--dark</code>, obsahové sekce <code>--auto</code>. Chování změníte prostou výměnou té jedné třídy.</p>
+            </div>
+            <div class="swds-help-block">
+                <h3>3. Editovatelné texty</h3>
                 <p>Nadpisy a texty mají atribut <code>editable="inline"</code> (prostý text + tučně/kurzíva). Hero nadpis s barevným přechodem má <code>editable="rich"</code>, protože obsahuje <code>&lt;span&gt;</code> — kdyby byl inline, LiveCanvas by span při editaci smazal a přechod by zmizel.</p>
             </div>
             <div class="swds-help-block">
-                <h3>3. Obrázky</h3>
+                <h3>4. Obrázky</h3>
                 <p>Obrázky jsou běžné <code>&lt;img&gt;</code> — v LiveCanvas je vyměníte kliknutím přes panel vlastností. Mají <code>loading="lazy"</code> kvůli výkonu.</p>
             </div>
             <div class="swds-help-block">
-                <h3>4. Animace</h3>
+                <h3>5. Animace</h3>
                 <p>Prvek s <code>data-sw-reveal</code> rozjede nájezd svých dětí (třída <code>sw-reveal-item</code>) při scrollu. Prvek s <code>data-sw-parallax</code> naklání mockup za myší. Vše respektuje systémové „omezit pohyb".</p>
             </div>
             <div class="swds-help-block">
-                <h3>5. Třídy nadpisů</h3>
+                <h3>6. Třídy nadpisů</h3>
                 <p><code>sw-h sw-h-display</code> (hero), <code>sw-h sw-h-large</code> (sekce), <code>sw-h sw-h-cta</code> (CTA). Velikost a styl řídí záložka Typografie — nezasahuje do globálního písma tématu.</p>
             </div>
         </div>
