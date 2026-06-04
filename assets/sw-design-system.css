@@ -738,7 +738,7 @@
    Light variant (.sw-process--light) for light section backgrounds;
    dark/glass by default + automatic dark-mode handling.
    ================================================================ */
-.sw-process-intro { max-width: 60rem; margin: 0 auto clamp(2rem, 4vw, 3rem); }
+.sw-process-intro { max-width: 70ch; margin: 0 0 clamp(2rem, 4vw, 3rem); }
 .sw-process-title { margin: 0 0 1rem; }
 .sw-process-lead p { margin: 0; color: var(--sw-text-muted); font-size: 1.08rem; line-height: 1.65; text-wrap: pretty; }
 
@@ -826,6 +826,154 @@
 
 @media (max-width: 767.98px) {
   .sw-process-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ================================================================
+   COMPONENT: FAQ (accordion)
+   Light variant (.sw-faq--light) for light backgrounds; dark/glass by
+   default + dark-mode handling. Toggle driven by JS (.is-open) + aria.
+   ================================================================ */
+.sw-faq-intro { max-width: 70ch; margin: 0 0 clamp(1.75rem, 3.5vw, 2.5rem); }
+.sw-faq-title { margin: 0 0 1rem; }
+.sw-faq-lead p { margin: 0; color: var(--sw-text-muted); font-size: 1.08rem; line-height: 1.65; text-wrap: pretty; }
+
+.sw-faq-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .55fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+.sw-faq-list { display: flex; flex-direction: column; gap: .85rem; }
+
+/* Decorative right column: brand glow + oversized question mark */
+.sw-faq-decor {
+  position: relative;
+  align-self: stretch;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.sw-faq-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 55% at 60% 40%, color-mix(in srgb, var(--sw-blue) 22%, transparent), transparent 70%),
+    radial-gradient(45% 45% at 35% 75%, color-mix(in srgb, var(--sw-blue-2, #38bdf8) 16%, transparent), transparent 70%);
+  filter: blur(8px);
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-faq-glow { background: radial-gradient(60% 55% at 60% 40%, rgba(0,150,226,.20), transparent 70%); }
+}
+.sw-faq-mark {
+  position: relative;
+  width: min(62%, 240px);
+  height: auto;
+  color: var(--sw-blue);
+  opacity: .22;
+}
+
+.sw-faq-item {
+  border-radius: var(--sw-radius-card);
+  border: 1px solid var(--sw-card-border);
+  background: var(--sw-card-bg);
+  box-shadow: var(--sw-shadow-card);
+  -webkit-backdrop-filter: blur(var(--sw-card-blur));
+          backdrop-filter: blur(var(--sw-card-blur));
+  overflow: hidden;
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+.sw-faq-item.is-open { border-color: color-mix(in srgb, var(--sw-blue) 45%, transparent); }
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-faq-item.is-open { border-color: var(--sw-blue); }
+}
+
+.sw-faq-q { margin: 0; }
+.sw-faq-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.4rem;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--sw-text);
+  font-family: inherit;
+}
+/* chevron */
+.sw-faq-trigger::after {
+  content: "";
+  flex-shrink: 0;
+  width: .7rem; height: .7rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform .25s ease;
+  opacity: .6;
+}
+.sw-faq-item.is-open .sw-faq-trigger { color: var(--sw-blue); }
+.sw-faq-item.is-open .sw-faq-trigger::after { transform: rotate(-135deg); opacity: 1; }
+
+.sw-faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+}
+.sw-faq-a-inner { padding: 0 1.4rem 1.25rem; }
+.sw-faq-a-inner p { margin: 0; color: var(--sw-text-muted); font-size: 1rem; line-height: 1.6; text-wrap: pretty; }
+.sw-faq-a-inner :is(p) + p { margin-top: .75rem; }
+
+/* ---------- LIGHT VARIANT ---------- */
+.sw-faq--light {
+  --sw-faq-ink: var(--bs-body-color, #333333);
+  --sw-faq-ink-muted: color-mix(in srgb, var(--bs-body-color, #333) 65%, transparent);
+  --sw-faq-card-bg: #ffffff;
+  --sw-faq-card-border: #e6ebf2;
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-faq--light { --sw-faq-ink-muted: #5b6470; }
+}
+.sw-faq--light .sw-faq-title { color: var(--sw-faq-ink); }
+.sw-faq--light .sw-faq-lead p { color: var(--sw-faq-ink-muted); }
+.sw-faq--light .sw-faq-item {
+  background: var(--sw-faq-card-bg);
+  border-color: var(--sw-faq-card-border);
+  box-shadow: 0 1px 2px rgba(16,42,80,.04), 0 12px 32px rgba(16,42,80,.07);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.sw-faq--light .sw-faq-trigger { color: var(--sw-faq-ink); }
+.sw-faq--light .sw-faq-item.is-open .sw-faq-trigger { color: var(--sw-blue); }
+.sw-faq--light .sw-faq-a-inner p { color: var(--sw-faq-ink-muted); }
+
+/* ---------- DARK MODE (light variant → glass) ---------- */
+[data-bs-theme="dark"] .sw-faq--light {
+  --sw-faq-ink: var(--bs-body-color, #f1f5f9);
+  --sw-faq-ink-muted: color-mix(in srgb, var(--bs-body-color, #f1f5f9) 65%, transparent);
+  --sw-faq-card-bg: rgba(255,255,255,.06);
+  --sw-faq-card-border: rgba(255,255,255,.14);
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  [data-bs-theme="dark"] .sw-faq--light { --sw-faq-ink-muted: rgba(241,245,249,.7); }
+}
+[data-bs-theme="dark"] .sw-faq--light .sw-faq-item {
+  background: var(--sw-faq-card-bg);
+  border-color: var(--sw-faq-card-border);
+  box-shadow: 0 18px 50px rgba(0,0,0,.4);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+
+/* Below lg: single column, hide the decorative visual */
+@media (max-width: 991.98px) {
+  .sw-faq-layout { grid-template-columns: 1fr; }
+  .sw-faq-decor { display: none; }
 }
 
 

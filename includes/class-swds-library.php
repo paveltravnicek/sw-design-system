@@ -54,6 +54,7 @@ class SWDS_Library {
                 array( 'key' => 'content', 'label' => 'Obsah' ),
                 array( 'key' => 'process', 'label' => 'Postup / proces' ),
                 array( 'key' => 'pricing', 'label' => 'Ceníky' ),
+                array( 'key' => 'faq',     'label' => 'Časté dotazy (FAQ)' ),
                 array( 'key' => 'cta',     'label' => 'Výzvy k akci (CTA)' ),
             ),
             'components' => array(
@@ -64,6 +65,7 @@ class SWDS_Library {
                 array( 'title' => 'Obsah + 2 obrázky',        'file' => 'component-content-2img.html','category' => 'content' ),
                 array( 'title' => 'Postup tvorby (8 kroků)',  'file' => 'component-process-steps.html','category' => 'process' ),
                 array( 'title' => 'Tabulka s cenami (3 sloupce)', 'file' => 'component-pricing-3col.html', 'category' => 'pricing' ),
+                array( 'title' => 'Časté dotazy (accordion)', 'file' => 'component-faq.html',         'category' => 'faq' ),
                 array( 'title' => 'CTA box',                  'file' => 'component-cta.html',         'category' => 'cta' ),
             ),
         );

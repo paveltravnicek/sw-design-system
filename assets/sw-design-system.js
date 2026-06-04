@@ -83,4 +83,45 @@
     stage.addEventListener('pointerleave', reset);
     parallaxOK.addEventListener('change', e => { if (!e.matches) reset(); });
   });
+
+  /* ---------- FAQ accordion ----------
+     [data-sw-accordion] containing .sw-faq-item with a .sw-faq-trigger
+     (button) and a .sw-faq-a panel. One open at a time. Height animated
+     via max-height; accessible via aria-expanded. No Bootstrap needed. */
+  document.querySelectorAll('[data-sw-accordion]').forEach(acc => {
+    const items = acc.querySelectorAll('.sw-faq-item');
+
+    const close = item => {
+      const btn   = item.querySelector('.sw-faq-trigger');
+      const panel = item.querySelector('.sw-faq-a');
+      if (!btn || !panel) return;
+      btn.setAttribute('aria-expanded', 'false');
+      item.classList.remove('is-open');
+      panel.style.maxHeight = '';
+    };
+    const open = item => {
+      const btn   = item.querySelector('.sw-faq-trigger');
+      const panel = item.querySelector('.sw-faq-a');
+      if (!btn || !panel) return;
+      btn.setAttribute('aria-expanded', 'true');
+      item.classList.add('is-open');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    };
+
+    items.forEach(item => {
+      const btn = item.querySelector('.sw-faq-trigger');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        const isOpen = item.classList.contains('is-open');
+        items.forEach(close);              // one open at a time
+        if (!isOpen) open(item);
+      });
+    });
+
+    // Keep an open panel's height correct on resize.
+    window.addEventListener('resize', () => {
+      const openItem = acc.querySelector('.sw-faq-item.is-open .sw-faq-a');
+      if (openItem) openItem.style.maxHeight = openItem.scrollHeight + 'px';
+    });
+  });
 })();

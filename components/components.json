@@ -5,6 +5,7 @@
     { "key": "content", "label": "Obsah" },
     { "key": "process", "label": "Postup / proces" },
     { "key": "pricing", "label": "Ceníky" },
+    { "key": "faq",     "label": "Časté dotazy (FAQ)" },
     { "key": "cta",     "label": "Výzvy k akci (CTA)" }
   ],
   "components": [
@@ -15,6 +16,7 @@
     { "title": "Obsah + 2 obrázky",        "file": "component-content-2img.html","category": "content" },
     { "title": "Postup tvorby (8 kroků)",  "file": "component-process-steps.html","category": "process" },
     { "title": "Tabulka s cenami (3 sloupce)", "file": "component-pricing-3col.html", "category": "pricing" },
+    { "title": "Časté dotazy (accordion)", "file": "component-faq.html",         "category": "faq" },
     { "title": "CTA box",                   "file": "component-cta.html",         "category": "cta" }
   ]
 }
