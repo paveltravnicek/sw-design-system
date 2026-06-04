@@ -52,6 +52,8 @@ class SWDS_Library {
                 array( 'key' => 'hero',    'label' => 'Hero sekce' ),
                 array( 'key' => 'trust',   'label' => 'Prvky důvěryhodnosti' ),
                 array( 'key' => 'content', 'label' => 'Obsah' ),
+                array( 'key' => 'process', 'label' => 'Postup / proces' ),
+                array( 'key' => 'pricing', 'label' => 'Ceníky' ),
                 array( 'key' => 'cta',     'label' => 'Výzvy k akci (CTA)' ),
             ),
             'components' => array(
@@ -60,6 +62,8 @@ class SWDS_Library {
                 array( 'title' => 'Prvky důvěryhodnosti (3)', 'file' => 'component-trust-3col.html',  'category' => 'trust' ),
                 array( 'title' => 'Prvky důvěryhodnosti (4)', 'file' => 'component-trust-4col.html',  'category' => 'trust' ),
                 array( 'title' => 'Obsah + 2 obrázky',        'file' => 'component-content-2img.html','category' => 'content' ),
+                array( 'title' => 'Postup tvorby (8 kroků)',  'file' => 'component-process-steps.html','category' => 'process' ),
+                array( 'title' => 'Tabulka s cenami (3 sloupce)', 'file' => 'component-pricing-3col.html', 'category' => 'pricing' ),
                 array( 'title' => 'CTA box',                  'file' => 'component-cta.html',         'category' => 'cta' ),
             ),
         );

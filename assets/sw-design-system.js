@@ -48,7 +48,7 @@
       }, {
         root: null,
         threshold: 0,
-        rootMargin: '0px 0px -5% 0px'  // reveal a bit before the very edge
+        rootMargin: '0px 0px -12% 0px'  // reveal a bit before the very edge
       });
 
       items.forEach(i => io.observe(i));
