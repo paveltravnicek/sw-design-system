@@ -16,6 +16,7 @@
     { "title": "Seznam kroků (čísla)",  "file": "component-process-steps.html","category": "process" },
     { "title": "Seznam kroků (ikony)",  "file": "component-process-steps-icons.html","category": "process" },
     { "title": "Tabulka s cenami (3 sloupce)", "file": "component-pricing-3col.html", "category": "pricing" },
+    { "title": "Tabulka s cenami (4 sloupce)", "file": "component-pricing-4col.html", "category": "pricing" },
     { "title": "Časté dotazy (accordion)", "file": "component-faq.html",         "category": "faq" },
     { "title": "CTA box",                   "file": "component-cta.html",         "category": "cta" }
   ]

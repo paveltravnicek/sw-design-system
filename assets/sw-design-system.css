@@ -43,8 +43,10 @@
   --sw-radius-cta:  2rem;
   --sw-radius-pill: 999px;
 
-  /* Type */
-  --sw-font:        system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Type — only the DS heading-scale sizes. Font-family is intentionally
+     NOT set here: it inherits from LiveCanvas/theme, same as everything
+     else on the page. The design system is a layer on top of Bootstrap,
+     not a replacement for it. */
   --sw-h-display:   clamp(3rem, 7vw, 6.8rem);
   --sw-h-large:     clamp(2.2rem, 5vw, 4.8rem);
   --sw-h-cta:       clamp(2rem, 5vw, 4.4rem);
@@ -155,7 +157,6 @@
   position: relative;
   isolation: isolate;
   color: var(--sw-text);
-  font-family: var(--sw-font);
   background:
     radial-gradient(circle at 12% 12%, var(--sw-spot-1), transparent 32rem),
     radial-gradient(circle at 88% 32%, var(--sw-spot-2), transparent 30rem),
@@ -190,12 +191,7 @@
   position: relative;
   padding-block: var(--sw-section-py);
   color: var(--sw-text);
-  font-family: var(--sw-font);
 }
-
-.sw-section *,
-.sw-section *::before,
-.sw-section *::after { box-sizing: border-box; }
 
 
 /* ================================================================
@@ -647,6 +643,13 @@
   .sw-pricing-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* --4 modifier: four plans instead of three. 2-col on md/lg (even pairs),
+   four across from xl up. (The lone-3rd-card centering above only ever
+   matches a grid with exactly 3 children, so it never fires here.) */
+@media (min-width: 1200px) {
+  .sw-pricing-grid--4 { grid-template-columns: repeat(4, 1fr); }
+}
+
 .sw-price-card {
   position: relative;
   display: flex;
@@ -770,6 +773,19 @@
   display: inline-flex; align-items: center; justify-content: center;
   border-radius: 14px;
   font-size: 1.2rem; font-weight: 800; line-height: 1;
+  color: #fff;
+  background: linear-gradient(135deg, var(--sw-blue), #38bdf8);
+  box-shadow: 0 8px 22px var(--sw-blue-glow, rgba(0,150,226,.4));
+}
+
+/* Icon variant (component-process-steps-icons.html): same badge treatment
+   as the numbered steps, sized for a glyph/checkmark instead of a number. */
+.sw-step-icon {
+  flex-shrink: 0;
+  width: 2.75rem; height: 2.75rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 14px;
+  font-size: 1.35rem; font-weight: 700; line-height: 1;
   color: #fff;
   background: linear-gradient(135deg, var(--sw-blue), #38bdf8);
   box-shadow: 0 8px 22px var(--sw-blue-glow, rgba(0,150,226,.4));
