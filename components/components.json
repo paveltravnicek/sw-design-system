@@ -6,6 +6,7 @@
     { "key": "process", "label": "Postup / proces" },
     { "key": "pricing", "label": "Ceníky" },
     { "key": "faq",     "label": "Časté dotazy (FAQ)" },
+    { "key": "hub",     "label": "Rozcestník služeb" },
     { "key": "cta",     "label": "Výzvy k akci (CTA)" }
   ],
   "components": [
@@ -19,6 +20,7 @@
     { "title": "Tabulka s cenami (3 sloupce)", "file": "component-pricing-3col.html", "category": "pricing" },
     { "title": "Tabulka s cenami (4 sloupce)", "file": "component-pricing-4col.html", "category": "pricing" },
     { "title": "Časté dotazy (accordion)", "file": "component-faq.html",         "category": "faq" },
+    { "title": "Rozcestník služeb (2+1)",  "file": "component-service-hub.html", "category": "hub" },
     { "title": "CTA box",                   "file": "component-cta.html",         "category": "cta" }
   ]
 }

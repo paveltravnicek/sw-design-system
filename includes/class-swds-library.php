@@ -55,6 +55,7 @@ class SWDS_Library {
                 array( 'key' => 'process', 'label' => 'Postup / proces' ),
                 array( 'key' => 'pricing', 'label' => 'Ceníky' ),
                 array( 'key' => 'faq',     'label' => 'Časté dotazy (FAQ)' ),
+                array( 'key' => 'hub',     'label' => 'Rozcestník služeb' ),
                 array( 'key' => 'cta',     'label' => 'Výzvy k akci (CTA)' ),
             ),
             'components' => array(
@@ -68,6 +69,7 @@ class SWDS_Library {
                 array( 'title' => 'Tabulka s cenami (3 sloupce)', 'file' => 'component-pricing-3col.html', 'category' => 'pricing' ),
                 array( 'title' => 'Tabulka s cenami (4 sloupce)', 'file' => 'component-pricing-4col.html', 'category' => 'pricing' ),
                 array( 'title' => 'Časté dotazy (accordion)', 'file' => 'component-faq.html',         'category' => 'faq' ),
+                array( 'title' => 'Rozcestník služeb (2+1)',  'file' => 'component-service-hub.html', 'category' => 'hub' ),
                 array( 'title' => 'CTA box',                  'file' => 'component-cta.html',         'category' => 'cta' ),
             ),
         );
