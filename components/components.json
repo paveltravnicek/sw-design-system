@@ -10,17 +10,18 @@
     { "key": "cta",     "label": "Výzvy k akci (CTA)" }
   ],
   "components": [
-    { "title": "Hero (s mockupem)",        "file": "component-hero.html",        "category": "hero" },
-    { "title": "Hero (statický obrázek)",  "file": "component-hero-static.html", "category": "hero" },
-    { "title": "Hero (s mini galerií)",    "file": "component-hero-gallery.html","category": "hero" },
-    { "title": "Prvky důvěryhodnosti (3)", "file": "component-trust-3col.html",  "category": "trust" },
-    { "title": "Obsah + 2 obrázky",        "file": "component-content-2img.html","category": "content" },
-    { "title": "Seznam kroků (čísla)",  "file": "component-process-steps.html","category": "process" },
-    { "title": "Seznam kroků (ikony)",  "file": "component-process-steps-icons.html","category": "process" },
-    { "title": "Tabulka s cenami (3 sloupce)", "file": "component-pricing-3col.html", "category": "pricing" },
-    { "title": "Tabulka s cenami (4 sloupce)", "file": "component-pricing-4col.html", "category": "pricing" },
-    { "title": "Časté dotazy (accordion)", "file": "component-faq.html",         "category": "faq" },
-    { "title": "Rozcestník služeb (2+1)",  "file": "component-service-hub.html", "category": "hub" },
-    { "title": "CTA box",                   "file": "component-cta.html",         "category": "cta" }
+    { "title": "Hero s mockupem (nekompatibilní s Bootstrap)",        "file": "component-hero.html",        "category": "hero" },
+    { "title": "Hero se statickým obrázkem (nekompatibilní s Bootstrap)",  "file": "component-hero-static.html", "category": "hero" },
+    { "title": "Hero s mini galerií (nekompatibilní s Bootstrap)",    "file": "component-hero-gallery.html","category": "hero" },
+    { "title": "3 prvky důvěryhodnosti (nekompatibilní s Bootstrap)", "file": "component-trust-3col.html",  "category": "trust" },
+    { "title": "Obsah a 2 obrázky vlevo",  "file": "component-content-2img-left.html",  "category": "content" },
+    { "title": "Obsah a 2 obrázky vpravo", "file": "component-content-2img-right.html", "category": "content" },
+    { "title": "Seznam kroků s čísly (nekompatibilní s Bootstrap)",  "file": "component-process-steps.html","category": "process" },
+    { "title": "Seznam kroků s ikonami (nekompatibilní s Bootstrap)",  "file": "component-process-steps-icons.html","category": "process" },
+    { "title": "3sloupcová tabulka s cenami (nekompatibilní s Bootstrap)", "file": "component-pricing-3col.html", "category": "pricing" },
+    { "title": "4sloupcová tabulka s cenami (nekompatibilní s Bootstrap)", "file": "component-pricing-4col.html", "category": "pricing" },
+    { "title": "Časté dotazy (nekompatibilní s Bootstrap)", "file": "component-faq.html",         "category": "faq" },
+    { "title": "Rozcestník služeb (nekompatibilní s Bootstrap)",  "file": "component-service-hub.html", "category": "hub" },
+    { "title": "CTA box (nekompatibilní s Bootstrap)",                   "file": "component-cta.html",         "category": "cta" }
   ]
 }
