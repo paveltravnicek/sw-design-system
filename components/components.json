@@ -11,6 +11,7 @@
   "components": [
     { "title": "Hero (s mockupem)",        "file": "component-hero.html",        "category": "hero" },
     { "title": "Hero (statický obrázek)",  "file": "component-hero-static.html", "category": "hero" },
+    { "title": "Hero (s mini galerií)",    "file": "component-hero-gallery.html","category": "hero" },
     { "title": "Prvky důvěryhodnosti (3)", "file": "component-trust-3col.html",  "category": "trust" },
     { "title": "Obsah + 2 obrázky",        "file": "component-content-2img.html","category": "content" },
     { "title": "Seznam kroků (čísla)",  "file": "component-process-steps.html","category": "process" },

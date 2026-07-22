@@ -205,6 +205,24 @@
 }
 
 .sw-h-display { font-size: var(--sw-h-display); max-width: 11.5ch; padding-right: .08em; line-height: .9; }
+/* Modifier for longer, full-sentence headlines (e.g. the gallery hero).
+   Below lg it's the same giant size as plain .sw-h-display — one uniform
+   heading, no split needed at that width, just more room to wrap since
+   the sentence is longer. From lg up it switches to a more moderate size
+   of its own and turns off text-wrap:balance: balance IS supported in
+   Safari, but the CSS spec explicitly leaves the exact balancing
+   algorithm up to each browser engine, so Safari and Chrome can
+   legitimately disagree on the line count for identical markup/CSS.
+   Plain greedy wrapping is the one thing every browser agrees on. */
+.sw-h-display--wide { max-width: 22ch; line-height: .95; }
+@media (min-width: 992px) {
+  .sw-h-display--wide {
+    font-size: clamp(2.5rem, 5.6vw, 5.4rem);
+    max-width: 26ch;
+    line-height: 1.05;
+    text-wrap: wrap;
+  }
+}
 .sw-h-large   { font-size: var(--sw-h-large); }
 .sw-h-cta     { font-size: var(--sw-h-cta); line-height: 1; letter-spacing: -.06em; }
 
@@ -214,6 +232,30 @@
           background-clip: text;
   color: var(--sw-h-grad-fallback, transparent);
   -webkit-text-fill-color: var(--sw-h-grad-fallback, transparent);
+}
+
+/* Optional: when the accent span covers most of a long sentence (not just
+   one punchy word), shrink it so the headline reads as "big lead-in +
+   smaller gradient tail" instead of forcing the whole sentence to the
+   giant display size. Add alongside the span's existing gradient class. */
+.sw-h-sub {
+  display: inline-block;
+  vertical-align: top;
+  /* The parent .sw-h sets a tight negative letter-spacing tuned for giant
+     display text. Reset both letter- and word-spacing so a stray
+     inherited value can never crush the spaces between words — this
+     matters even below lg, where the span is still full-size. */
+  letter-spacing: -.01em;
+  word-spacing: normal;
+}
+/* Below lg the sub-span is just part of one uniform heading size — no
+   split needed at that width. From lg up it becomes visibly smaller,
+   reading as "big lead-in + smaller gradient tail". */
+@media (min-width: 992px) {
+  .sw-h-sub {
+    font-size: clamp(1.65rem, 3.7vw, 3.6rem);
+    line-height: 1.05;
+  }
 }
 @supports not (background-clip: text) {
   .sw-h-gradient span { color: var(--sw-blue-2); -webkit-text-fill-color: currentColor; }
@@ -308,6 +350,17 @@
   gap: clamp(2rem, 5vw, 4rem);
   align-items: center;
 }
+/* The gallery visual needs less width than the big single mockup, so give
+   the copy column more room — important for long headlines (see the
+   --wide heading modifier). Scoped to this variant, and to widths where
+   the grid is still 2 columns — :has() has higher specificity than the
+   plain-class mobile override below, so it must stay inside this same
+   min-width guard or it would outrank the single-column collapse. */
+@media (min-width: 992px) {
+  .sw-hero-grid:has(.sw-hero-gallery) {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  }
+}
 .sw-hero-copy { min-width: 0; }
 
 .sw-hero-stage {
@@ -400,6 +453,7 @@
   .sw-hero-stage      { perspective: none; max-width: 620px; }
   .sw-browser         { transform: none; }
   .sw-phone           { transform: none; width: 30%; right: -5%; top: 16%; }
+  .sw-hero-gallery    { max-width: 520px; }
 }
 @media (max-width: 575.98px) {
   .sw-phone           { width: 30%; right: -4%; top: 14%; }
@@ -416,6 +470,72 @@
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* ================================================================
+   HERO: GALLERY VARIANT — cluster of floating website screenshots.
+   Alternative to .sw-hero-stage (single browser+phone mockup).
+   Pure CSS, no JS dependency. Respects prefers-reduced-motion (via
+   the global REDUCED MOTION rule below) and the admin "Animace"
+   toggle (via --sw-scroll-play, same token the scroll mockups use).
+   ================================================================ */
+.sw-hero-gallery {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  aspect-ratio: 4 / 3;
+  margin-inline: auto;
+  margin-bottom: clamp(2.5rem, 9vw, 5rem);
+}
+
+.sw-shot {
+  position: absolute;
+  border-radius: 1rem;
+  border: 1px solid var(--sw-border);
+  overflow: hidden;
+  box-shadow: var(--sw-shadow-deep);
+  background: rgba(255, 255, 255, .06);
+  aspect-ratio: 16 / 10;
+  rotate: var(--shot-rot, 0deg);
+  opacity: 0;
+  scale: .94;
+  animation:
+    swShotIn .7s var(--shot-in-delay, 0s) cubic-bezier(.22, .7, .3, 1) both,
+    swShotFloat var(--shot-float-dur, 7s) var(--shot-float-delay, .8s) ease-in-out infinite;
+  animation-play-state: running, var(--sw-scroll-play, running);
+}
+.sw-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* Five-card scattered cascade — front card largest/centered, rest peek
+   out around it with alternating rotation for an organic, not-gridded
+   feel. Positions are % of the container, so the cluster scales with it. */
+.sw-shot--1 { width: 56%; top: 6%;  left: 22%; z-index: 5; --shot-rot: -2deg; --shot-in-delay: 0s;   --shot-float-dur: 7.5s; --shot-float-delay: .8s;  }
+.sw-shot--2 { width: 36%; top: 0%;  left: 60%; z-index: 4; --shot-rot: 6deg;  --shot-in-delay: .08s; --shot-float-dur: 8.5s; --shot-float-delay: .9s;  }
+.sw-shot--3 { width: 32%; top: 42%; left: 0%;  z-index: 3; --shot-rot: -7deg; --shot-in-delay: .16s; --shot-float-dur: 9s;   --shot-float-delay: 1s;   }
+.sw-shot--4 { width: 34%; top: 56%; left: 62%; z-index: 2; --shot-rot: 5deg;  --shot-in-delay: .24s; --shot-float-dur: 7.8s; --shot-float-delay: 1.1s; }
+.sw-shot--5 { width: 28%; top: 66%; left: 26%; z-index: 1; --shot-rot: -4deg; --shot-in-delay: .32s; --shot-float-dur: 8.2s; --shot-float-delay: 1.2s; }
+
+@keyframes swShotIn {
+  from { opacity: 0; scale: .94; }
+  to   { opacity: 1; scale: 1; }
+}
+@keyframes swShotFloat {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -10px; }
+}
+
+@media (max-width: 575.98px) {
+  /* Tighter cluster on small phones so cards stay legible. */
+  .sw-shot--2, .sw-shot--4 { display: none; }
+  .sw-shot--1 { width: 62%; top: 4%;  left: 18%; }
+  .sw-shot--3 { width: 40%; top: 46%; left: 2%;  }
+  .sw-shot--5 { width: 34%; top: 54%; left: 54%; }
 }
 
 
