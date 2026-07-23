@@ -640,13 +640,10 @@
 
 /* ================================================================
    COMPONENT: CONTENT + 2 IMAGES (admin showcase pattern)
+   Layout is Bootstrap .row/.col-* (see component HTML) — only the
+   decorative overlapping-photo-stack effect lives here, since that's
+   not something Bootstrap provides on its own.
    ================================================================ */
-.sw-content2img-grid {
-  display: grid;
-  grid-template-columns: .9fr 1.1fr;
-  gap: clamp(2rem, 5vw, 4rem);
-  align-items: center;
-}
 
 .sw-content2img-copy h2 { margin: 0 0 1rem; }
 .sw-content2img-copy p {
@@ -697,7 +694,6 @@
 }
 
 @media (max-width: 991.98px) {
-  .sw-content2img-grid  { grid-template-columns: 1fr; }
   .sw-content2img-stack {
     width: min(520px, 100%);
     margin-inline: auto;
