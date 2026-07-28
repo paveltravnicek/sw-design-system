@@ -1186,6 +1186,14 @@
 .sw-journey-intro-kicker { margin: 0 0 .5rem; font-size: 1.1rem; font-weight: 700; color: var(--sw-blue); }
 .sw-journey-intro-body p:not(.sw-journey-intro-kicker) { margin: 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
 
+/* Left column stays in view while the (usually taller) step list scrolls
+   past it, and scrolls away normally once the row itself ends. Only at
+   lg+ — on a single stacked mobile column, sticking the intro above
+   content that's already below it in the flow wouldn't make sense. */
+@media (min-width: 992px) {
+  .sw-journey-sticky { position: sticky; top: 2rem; }
+}
+
 /* Decorative glow + compass mark, filling the space below the intro text
    on wide screens (same technique as the FAQ section's question mark). */
 .sw-journey-decor {
@@ -1226,7 +1234,7 @@
 
 .sw-journey-marker-col {
   position: relative;
-  padding-right: clamp(1.75rem, 4vw, 3rem);
+  margin-right: clamp(1.75rem, 4vw, 3rem);
   flex-shrink: 0;
 }
 /* Connecting line down to the next step's marker. Not drawn after the
@@ -1289,7 +1297,7 @@
 
 @media (max-width: 575.98px) {
   .sw-journey-num { width: 3rem; height: 3rem; font-size: 1.15rem; }
-  .sw-journey-marker-col { padding-right: 1.25rem; }
+  .sw-journey-marker-col { margin-right: 1.25rem; }
   .sw-journey-step:not(.sw-journey-step--last) .sw-journey-marker-col::after { left: 1.5rem; top: 3rem; }
 }
 
