@@ -1308,6 +1308,24 @@
 
 
 /* ================================================================
+   COMPONENT: TRUST MINI (4 columns, lightweight — no card, no photo)
+   Deliberately quieter than .sw-trust-card: just a colored accent line,
+   a title and a short description. Layout is Bootstrap .row/.col-*,
+   no custom grid. Surface-aware via --sw-text/--sw-text-muted.
+   ================================================================ */
+.sw-trust-mini-intro { margin: 0 0 clamp(2rem, 4vw, 3rem); }
+.sw-trust-mini-title { margin: 0; }
+
+.sw-trust-mini-item {
+  padding-top: 1.1rem;
+  border-top: 3px solid var(--sw-blue);
+  height: 100%;
+}
+.sw-trust-mini-name { margin: 0 0 .5rem; font-size: 1.05rem; font-weight: 750; letter-spacing: -.01em; color: var(--sw-text); }
+.sw-trust-mini-desc { margin: 0; font-size: .94rem; line-height: 1.55; color: var(--sw-text-muted); }
+
+
+/* ================================================================
    REDUCED MOTION
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {

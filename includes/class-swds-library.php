@@ -63,6 +63,7 @@ class SWDS_Library {
                 array( 'title' => 'Hero se statickým obrázkem (nekompatibilní s Bootstrap)',  'file' => 'component-hero-static.html', 'category' => 'hero' ),
                 array( 'title' => 'Hero s mini galerií (nekompatibilní s Bootstrap)',    'file' => 'component-hero-gallery.html','category' => 'hero' ),
                 array( 'title' => '3 prvky důvěryhodnosti (nekompatibilní s Bootstrap)', 'file' => 'component-trust-3col.html',  'category' => 'trust' ),
+                array( 'title' => '4 prvky důvěryhodnosti', 'file' => 'component-trust-mini-4col.html', 'category' => 'trust' ),
                 array( 'title' => 'Obsah a 2 obrázky vlevo',  'file' => 'component-content-2img-left.html',  'category' => 'content' ),
                 array( 'title' => 'Obsah a 2 obrázky vpravo', 'file' => 'component-content-2img-right.html', 'category' => 'content' ),
                 array( 'title' => 'Seznam kroků s čísly (nekompatibilní s Bootstrap)',     'file' => 'component-process-steps.html', 'category' => 'process' ),

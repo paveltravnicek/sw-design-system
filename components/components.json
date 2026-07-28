@@ -14,6 +14,7 @@
     { "title": "Hero se statickým obrázkem (nekompatibilní s Bootstrap)",  "file": "component-hero-static.html", "category": "hero" },
     { "title": "Hero s mini galerií (nekompatibilní s Bootstrap)",    "file": "component-hero-gallery.html","category": "hero" },
     { "title": "3 prvky důvěryhodnosti (nekompatibilní s Bootstrap)", "file": "component-trust-3col.html",  "category": "trust" },
+    { "title": "4 prvky důvěryhodnosti", "file": "component-trust-mini-4col.html", "category": "trust" },
     { "title": "Obsah a 2 obrázky vlevo",  "file": "component-content-2img-left.html",  "category": "content" },
     { "title": "Obsah a 2 obrázky vpravo", "file": "component-content-2img-right.html", "category": "content" },
     { "title": "Seznam kroků s čísly (nekompatibilní s Bootstrap)",  "file": "component-process-steps.html","category": "process" },
