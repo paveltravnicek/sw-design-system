@@ -17,6 +17,7 @@
 
   const noMotion   = window.matchMedia('(prefers-reduced-motion: reduce)');
   const parallaxOK = window.matchMedia('(min-width: 992px) and (pointer: fine)');
+  const hoverOK     = window.matchMedia('(hover: hover) and (pointer: fine)');
 
   /* ---------- Reveal on enter ----------
      Each [data-sw-reveal] container gets .sw-anim-on (hides its
@@ -169,10 +170,15 @@
 
     // Hover is tracked in JS (.is-hover), not left to CSS :hover — see
     // the note above .sw-testimonials-arrow.is-hover in the stylesheet.
-    [prev, next].forEach(btn => {
-      btn.addEventListener('mouseenter', () => { if (!btn.disabled) btn.classList.add('is-hover'); });
-      btn.addEventListener('mouseleave', () => btn.classList.remove('is-hover'));
-    });
+    // Only wired up on devices with a real pointer (mouse/trackpad) —
+    // touchscreens have no true "hover", and a tap can otherwise leave
+    // the class looking stuck on since there's no mouse to leave with.
+    if (hoverOK.matches) {
+      [prev, next].forEach(btn => {
+        btn.addEventListener('mouseenter', () => { if (!btn.disabled) btn.classList.add('is-hover'); });
+        btn.addEventListener('mouseleave', () => btn.classList.remove('is-hover'));
+      });
+    }
 
     const updateArrows = () => {
       const max = track.scrollWidth - track.clientWidth - 1;
