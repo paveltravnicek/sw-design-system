@@ -1356,6 +1356,15 @@
   scroll-behavior: smooth;
   padding: .25rem .25rem 1rem;
   scrollbar-width: none;
+  /* Cards fade to transparent right at the edges instead of getting cut
+     off hard — and the small negative margin lets that fading edge
+     visually tuck a little under the arrow buttons, like the card is
+     sliding away behind them rather than just stopping. The arrows get
+     an explicit stacking order below so they stay fully opaque on top
+     of that fade (see .sw-testimonials-arrow). */
+  margin: 0 -1rem;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 2.75rem, #000 calc(100% - 2.75rem), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 2.75rem, #000 calc(100% - 2.75rem), transparent 100%);
 }
 .sw-testimonials-track::-webkit-scrollbar { display: none; }
 
@@ -1391,6 +1400,8 @@
 .sw-testimonial-name { margin: 0; font-weight: 700; color: var(--sw-text); }
 
 .sw-testimonials-arrow {
+  position: relative;
+  z-index: 2;
   flex-shrink: 0;
   width: 3rem; height: 3rem;
   display: inline-flex; align-items: center; justify-content: center;
