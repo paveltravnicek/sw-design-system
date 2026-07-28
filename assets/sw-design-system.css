@@ -1176,15 +1176,48 @@
 
 
 /* ================================================================
-   COMPONENT: JOURNEY (connected numbered timeline, rich per-step content)
-   Layout is Bootstrap .row (.col-auto marker + .col content) per step —
-   no custom grid. The connecting line and marker circle are decorative
-   only, not layout. Surface-aware via --sw-text/--sw-card-bg/etc.
+   COMPONENT: JOURNEY (two-column: intro+decor left, step list right)
+   Layout is Bootstrap .row/.col-lg-6 for the two-column split, and
+   .row (.col-auto marker + .col content) per step — no custom grid
+   anywhere. The connecting line, marker circle and decor glow are
+   decorative only. Surface-aware via --sw-text/--sw-card-bg/etc.
    ================================================================ */
-.sw-journey-intro { max-width: 68ch; margin: 0 0 clamp(2.5rem, 5vw, 4rem); }
 .sw-journey-intro-body { margin-top: 1rem; }
 .sw-journey-intro-kicker { margin: 0 0 .5rem; font-size: 1.1rem; font-weight: 700; color: var(--sw-blue); }
 .sw-journey-intro-body p:not(.sw-journey-intro-kicker) { margin: 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
+
+/* Decorative glow + compass mark, filling the space below the intro text
+   on wide screens (same technique as the FAQ section's question mark). */
+.sw-journey-decor {
+  position: relative;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  margin-top: 1.5rem;
+  pointer-events: none;
+}
+.sw-journey-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 55% at 40% 45%, color-mix(in srgb, var(--sw-blue) 20%, transparent), transparent 70%),
+    radial-gradient(45% 45% at 65% 70%, color-mix(in srgb, var(--sw-blue-2, #38bdf8) 15%, transparent), transparent 70%);
+  filter: blur(8px);
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-journey-glow { background: radial-gradient(60% 55% at 40% 45%, rgba(0,150,226,.18), transparent 70%); }
+}
+.sw-journey-mark {
+  position: relative;
+  width: min(52%, 220px);
+  height: auto;
+  color: var(--sw-blue);
+  opacity: .2;
+}
+@media (min-width: 992px) {
+  .sw-journey-decor { display: flex; }
+}
 
 .sw-journey-list { display: flex; flex-direction: column; }
 
@@ -1193,7 +1226,7 @@
 
 .sw-journey-marker-col {
   position: relative;
-  padding-right: clamp(1.25rem, 3vw, 2.25rem);
+  padding-right: clamp(1.75rem, 4vw, 3rem);
   flex-shrink: 0;
 }
 /* Connecting line down to the next step's marker. Not drawn after the
@@ -1256,7 +1289,7 @@
 
 @media (max-width: 575.98px) {
   .sw-journey-num { width: 3rem; height: 3rem; font-size: 1.15rem; }
-  .sw-journey-marker-col { padding-right: 1rem; }
+  .sw-journey-marker-col { padding-right: 1.25rem; }
   .sw-journey-step:not(.sw-journey-step--last) .sw-journey-marker-col::after { left: 1.5rem; top: 3rem; }
 }
 
