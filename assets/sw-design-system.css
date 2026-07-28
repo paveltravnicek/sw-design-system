@@ -1176,6 +1176,94 @@
 
 
 /* ================================================================
+   COMPONENT: JOURNEY (connected numbered timeline, rich per-step content)
+   Layout is Bootstrap .row (.col-auto marker + .col content) per step —
+   no custom grid. The connecting line and marker circle are decorative
+   only, not layout. Surface-aware via --sw-text/--sw-card-bg/etc.
+   ================================================================ */
+.sw-journey-intro { max-width: 68ch; margin: 0 0 clamp(2.5rem, 5vw, 4rem); }
+.sw-journey-intro-body { margin-top: 1rem; }
+.sw-journey-intro-kicker { margin: 0 0 .5rem; font-size: 1.1rem; font-weight: 700; color: var(--sw-blue); }
+.sw-journey-intro-body p:not(.sw-journey-intro-kicker) { margin: 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
+
+.sw-journey-list { display: flex; flex-direction: column; }
+
+.sw-journey-step { margin-bottom: clamp(2rem, 4vw, 3rem); }
+.sw-journey-step--last { margin-bottom: 0; }
+
+.sw-journey-marker-col {
+  position: relative;
+  padding-right: clamp(1.25rem, 3vw, 2.25rem);
+  flex-shrink: 0;
+}
+/* Connecting line down to the next step's marker. Not drawn after the
+   last step (nothing to connect to). */
+.sw-journey-step:not(.sw-journey-step--last) .sw-journey-marker-col::after {
+  content: "";
+  position: absolute;
+  top: 3.75rem;
+  bottom: calc(clamp(2rem, 4vw, 3rem) * -1);
+  left: 1.875rem;
+  width: 2px;
+  background: var(--sw-card-border);
+  transform: translateX(-50%);
+}
+
+.sw-journey-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.75rem; height: 3.75rem;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--sw-blue), #38bdf8);
+  box-shadow: 0 10px 26px var(--sw-blue-glow, rgba(0,150,226,.4));
+}
+
+.sw-journey-body { padding-top: .6rem; }
+.sw-journey-kicker { margin: 0 0 .35rem; font-size: .92rem; font-weight: 700; letter-spacing: .01em; color: var(--sw-blue); }
+.sw-journey-name { margin: 0 0 .6rem; font-size: clamp(1.3rem, 2.2vw, 1.7rem); font-weight: 750; letter-spacing: -.01em; color: var(--sw-text); }
+.sw-journey-desc { margin: 0 0 1.25rem; max-width: 62ch; color: var(--sw-text-muted); font-size: 1rem; line-height: 1.65; }
+
+/* "Doporučujeme, pokud" — a second, subtler visual tier inside each step,
+   distinguishing "the pitch" from "is this you". */
+.sw-journey-fit {
+  display: inline-block;
+  max-width: 46rem;
+  padding: 1.1rem 1.4rem;
+  border-radius: var(--sw-radius-card);
+  background: var(--sw-card-bg);
+  border: 1px solid var(--sw-card-border);
+  -webkit-backdrop-filter: blur(var(--sw-card-blur));
+          backdrop-filter: blur(var(--sw-card-blur));
+}
+.sw-journey-fit-label { margin: 0 0 .6rem; font-size: .88rem; font-weight: 700; color: var(--sw-text); }
+.sw-journey-fit-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.sw-journey-fit-list li { display: flex; align-items: flex-start; gap: .6rem; font-size: .94rem; line-height: 1.4; color: var(--sw-text-muted); }
+.sw-journey-check {
+  flex-shrink: 0;
+  width: 1.25rem; height: 1.25rem;
+  margin-top: .05rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sw-blue) 16%, transparent);
+}
+.sw-journey-check svg { width: .78rem; height: .78rem; fill: var(--sw-blue); }
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-journey-check { background: rgba(0,150,226,.16); }
+}
+
+@media (max-width: 575.98px) {
+  .sw-journey-num { width: 3rem; height: 3rem; font-size: 1.15rem; }
+  .sw-journey-marker-col { padding-right: 1rem; }
+  .sw-journey-step:not(.sw-journey-step--last) .sw-journey-marker-col::after { left: 1.5rem; top: 3rem; }
+  .sw-journey-fit { display: block; max-width: none; }
+}
+
+
+/* ================================================================
    REDUCED MOTION
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {
