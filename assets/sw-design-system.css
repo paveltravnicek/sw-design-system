@@ -1348,7 +1348,8 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: .35rem .1rem 1rem;
+  padding: 1.5rem 2rem 2rem;
+  margin: -1.5rem -2rem -2rem;
   scrollbar-width: none;
 }
 .sw-testimonials-track::-webkit-scrollbar { display: none; }
@@ -1386,10 +1387,11 @@
   border-color: var(--sw-blue);
   color: #fff;
 }
-.sw-testimonials-arrow:disabled { opacity: .35; cursor: default; }
+.sw-testimonials-arrow:disabled { opacity: .35; cursor: default; pointer-events: none; }
 
 @media (max-width: 575.98px) {
   .sw-testimonials-arrow { display: none; }
+  .sw-testimonials-track { padding: 1rem .75rem 1.5rem; margin: -1rem -.75rem -1.5rem; }
 }
 
 
