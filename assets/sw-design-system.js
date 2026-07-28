@@ -182,8 +182,14 @@
 
     const updateArrows = () => {
       const max = track.scrollWidth - track.clientWidth - 1;
-      prev.disabled = track.scrollLeft <= 4;
-      next.disabled = max <= 0 || track.scrollLeft >= max - 4;
+      const atStart = track.scrollLeft <= 4;
+      const atEnd = max <= 0 || track.scrollLeft >= max - 4;
+      prev.disabled = atStart;
+      next.disabled = atEnd;
+      // No fade toward a side with no more content to reveal — see the
+      // .is-at-start/.is-at-end rules in the stylesheet.
+      track.classList.toggle('is-at-start', atStart);
+      track.classList.toggle('is-at-end', atEnd);
       // A click can disable a button while the mouse never actually
       // leaves it — clear the hover class right here too, instead of
       // waiting on a mouseleave event that may or may not still fire.
