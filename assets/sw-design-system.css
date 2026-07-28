@@ -1446,6 +1446,7 @@
 
 @media (max-width: 575.98px) {
   .sw-testimonials-arrow { display: none; }
+  .sw-testimonials-track { margin: 0; }
 }
 
 
