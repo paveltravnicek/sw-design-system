@@ -124,4 +124,25 @@
       if (openItem) openItem.style.maxHeight = openItem.scrollHeight + 'px';
     });
   });
+
+  /* ---------- Fixed/sticky navbar offset ----------
+     Sticky elements (see .sw-journey-sticky) need to stop below a fixed
+     header instead of sliding under it. Measuring the navbar's real
+     height at runtime — instead of a hardcoded pixel value in CSS —
+     means this keeps working if the header's height ever changes
+     (responsive breakpoints, or a future menu redesign), without
+     needing a CSS edit every time. Looks for .navbar; if none is
+     found, --sw-navbar-h stays 0 and sticky elements just use their
+     own base offset. */
+  const updateNavbarOffset = () => {
+    const nav = document.querySelector('.navbar');
+    const h = nav ? Math.ceil(nav.getBoundingClientRect().height) : 0;
+    document.documentElement.style.setProperty('--sw-navbar-h', h + 'px');
+  };
+  updateNavbarOffset();
+  let navResizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(navResizeTimer);
+    navResizeTimer = setTimeout(updateNavbarOffset, 150);
+  });
 })();

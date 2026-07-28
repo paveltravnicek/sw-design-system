@@ -9,6 +9,11 @@
    1. TOKENS  — change these to retheme the whole system
    ================================================================ */
 :root {
+  /* Fixed/sticky navbar height, measured at runtime by sw-design-system.js
+     (looks for .navbar). Stays 0 if no navbar is found, so sticky
+     elements just fall back to their own base offset. */
+  --sw-navbar-h: 0px;
+
   /* Brand colors */
   --sw-blue:        #0096E2;
   --sw-blue-2:      #5cc8ff;
@@ -1191,7 +1196,7 @@
    lg+ — on a single stacked mobile column, sticking the intro above
    content that's already below it in the flow wouldn't make sense. */
 @media (min-width: 992px) {
-  .sw-journey-sticky { position: sticky; top: 2rem; }
+  .sw-journey-sticky { position: sticky; top: calc(var(--sw-navbar-h, 0px) + 1.5rem); }
 }
 
 /* Decorative glow + compass mark, filling the space below the intro text
