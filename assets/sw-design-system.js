@@ -145,4 +145,40 @@
     clearTimeout(navResizeTimer);
     navResizeTimer = setTimeout(updateNavbarOffset, 150);
   });
+
+  /* ---------- Testimonials slider ----------
+     The track is a native scroll-snap container — it already works via
+     touch/trackpad/keyboard with no JS at all. The arrow buttons are a
+     progressive-enhancement convenience: nudge scrollLeft by one card's
+     width, and auto-disable at each end. */
+  document.querySelectorAll('.sw-testimonials-slider').forEach(slider => {
+    const track = slider.querySelector('.sw-testimonials-track');
+    const prev  = slider.querySelector('.sw-testimonials-arrow--prev');
+    const next  = slider.querySelector('.sw-testimonials-arrow--next');
+    if (!track || !prev || !next) return;
+
+    const cardStep = () => {
+      const card = track.querySelector('.sw-testimonial-card');
+      if (!card) return track.clientWidth * .8;
+      const style = getComputedStyle(track);
+      return card.getBoundingClientRect().width + parseFloat(style.gap || '0');
+    };
+
+    prev.addEventListener('click', () => track.scrollBy({ left: -cardStep(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left:  cardStep(), behavior: 'smooth' }));
+
+    const updateArrows = () => {
+      const max = track.scrollWidth - track.clientWidth - 1;
+      prev.disabled = track.scrollLeft <= 4;
+      next.disabled = max <= 0 || track.scrollLeft >= max - 4;
+    };
+    updateArrows();
+
+    let scrollTimer;
+    track.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(updateArrows, 80);
+    });
+    window.addEventListener('resize', updateArrows);
+  });
 })();

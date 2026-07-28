@@ -56,6 +56,7 @@ class SWDS_Library {
                 array( 'key' => 'pricing', 'label' => 'Ceníky' ),
                 array( 'key' => 'faq',     'label' => 'Časté dotazy (FAQ)' ),
                 array( 'key' => 'hub',     'label' => 'Rozcestník služeb' ),
+                array( 'key' => 'testimonials', 'label' => 'Reference' ),
                 array( 'key' => 'cta',     'label' => 'Výzvy k akci (CTA)' ),
             ),
             'components' => array(
@@ -73,6 +74,7 @@ class SWDS_Library {
                 array( 'title' => '4sloupcová tabulka s cenami (nekompatibilní s Bootstrap)', 'file' => 'component-pricing-4col.html', 'category' => 'pricing' ),
                 array( 'title' => 'Časté dotazy (nekompatibilní s Bootstrap)', 'file' => 'component-faq.html',         'category' => 'faq' ),
                 array( 'title' => 'Rozcestník služeb (nekompatibilní s Bootstrap)',  'file' => 'component-service-hub.html', 'category' => 'hub' ),
+                array( 'title' => 'Reference', 'file' => 'component-testimonials.html', 'category' => 'testimonials' ),
                 array( 'title' => 'CTA box (nekompatibilní s Bootstrap)',                  'file' => 'component-cta.html',         'category' => 'cta' ),
             ),
         );

@@ -1326,6 +1326,74 @@
 
 
 /* ================================================================
+   COMPONENT: TESTIMONIALS (native scroll-snap slider, no library)
+   Track is a scrollable flex row; the arrow buttons just nudge
+   scrollLeft by one card's width (see sw-design-system.js). Works
+   without JS too (native touch/trackpad/keyboard scroll on the
+   track), the buttons are a progressive-enhancement convenience.
+   Not a Bootstrap row/col layout on purpose — this is a horizontal
+   scroller, a different UI need than the wrapping grids elsewhere,
+   and Bootstrap doesn't ship a multi-item scroller primitive.
+   ================================================================ */
+.sw-testimonials-intro { max-width: 62ch; margin: 0 0 clamp(2rem, 4vw, 3rem); }
+.sw-testimonials-lead { margin: 1rem 0 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
+
+.sw-testimonials-slider { display: flex; align-items: center; gap: .75rem; }
+
+.sw-testimonials-track {
+  display: flex;
+  gap: 1.25rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: .35rem .1rem 1rem;
+  scrollbar-width: none;
+}
+.sw-testimonials-track::-webkit-scrollbar { display: none; }
+
+.sw-testimonial-card {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: min(82vw, 320px);
+  padding: 1.75rem;
+  border-radius: var(--sw-radius-card);
+  background: var(--sw-card-bg);
+  border: 1px solid var(--sw-card-border);
+  box-shadow: var(--sw-shadow-card);
+  -webkit-backdrop-filter: blur(var(--sw-card-blur));
+          backdrop-filter: blur(var(--sw-card-blur));
+}
+.sw-testimonial-stars { margin: 0 0 .75rem; color: var(--sw-blue); font-size: 1.05rem; letter-spacing: .1em; }
+.sw-testimonial-text { margin: 0 0 1.1rem; color: var(--sw-text); font-size: .96rem; line-height: 1.6; }
+.sw-testimonial-name { margin: 0; font-weight: 700; color: var(--sw-text); }
+
+.sw-testimonials-arrow {
+  flex-shrink: 0;
+  width: 3rem; height: 3rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--sw-card-border);
+  background: var(--sw-card-bg);
+  color: var(--sw-text);
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, border-color .2s ease, opacity .2s ease;
+}
+.sw-testimonials-arrow svg { width: 1.3rem; height: 1.3rem; }
+.sw-testimonials-arrow:hover:not(:disabled) {
+  background: var(--sw-blue);
+  border-color: var(--sw-blue);
+  color: #fff;
+}
+.sw-testimonials-arrow:disabled { opacity: .35; cursor: default; }
+
+@media (max-width: 575.98px) {
+  .sw-testimonials-arrow { display: none; }
+}
+
+
+/* ================================================================
    REDUCED MOTION
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {

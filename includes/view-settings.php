@@ -207,9 +207,8 @@ $tabs['library'] = array( 'title' => 'Komponenty', 'icon' => 'block-default' );
                 <span class="swds-help" style="margin-left:10px;">Sekcí k dispozici: <?php echo (int) $total; ?></span>
             </p>
 
-            <?php $i = 0; foreach ( $groups as $gi => $g ) :
-                $open = ( 0 === $gi ); // first category open by default ?>
-                <div class="swds-comp-cat<?php echo $open ? ' is-open' : ''; ?>" data-cat>
+            <?php $i = 0; foreach ( $groups as $g ) : ?>
+                <div class="swds-comp-cat" data-cat>
                     <button type="button" class="swds-comp-cat-head" data-cat-toggle>
                         <span class="swds-comp-cat-arrow dashicons dashicons-arrow-right-alt2"></span>
                         <span class="swds-comp-cat-label"><?php echo esc_html( $g['label'] ); ?></span>
