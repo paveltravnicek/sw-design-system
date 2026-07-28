@@ -1338,7 +1338,7 @@
 .sw-testimonials-intro { max-width: 62ch; margin: 0 0 clamp(2rem, 4vw, 3rem); }
 .sw-testimonials-lead { margin: 1rem 0 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
 
-.sw-testimonials-slider { display: flex; align-items: center; gap: .75rem; }
+.sw-testimonials-slider { display: flex; align-items: center; gap: 1.5rem; }
 
 .sw-testimonials-track {
   display: flex;
@@ -1348,8 +1348,13 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  padding: 1.5rem 2rem 2rem;
-  margin: -1.5rem -2rem -2rem;
+  /* Horizontal padding is intentionally smaller than the 1.5rem gap above
+     (with matching negative margin to cancel the layout shift) — it only
+     reclaims empty gap space for the shadow to render into, never reaching
+     into the arrow buttons' own box. Vertical has no sibling to collide
+     with, so it can be generous. */
+  padding: 1.5rem 1rem 2rem;
+  margin: -1.5rem -1rem -2rem;
   scrollbar-width: none;
 }
 .sw-testimonials-track::-webkit-scrollbar { display: none; }
@@ -1382,7 +1387,13 @@
   transition: background .2s ease, color .2s ease, border-color .2s ease, opacity .2s ease;
 }
 .sw-testimonials-arrow svg { width: 1.3rem; height: 1.3rem; }
-.sw-testimonials-arrow:hover:not(:disabled) {
+/* Hover is JS-managed (.is-hover), not CSS :hover — browsers disagree on
+   whether an already-active :hover state clears itself when an element
+   becomes disabled without a further pointer event, which is exactly
+   what caused the "stuck blue after disabling" bug. JS explicitly
+   toggles this class and explicitly clears it the instant a button
+   becomes disabled, so it can never get stuck either way. */
+.sw-testimonials-arrow.is-hover:not(:disabled) {
   background: var(--sw-blue);
   border-color: var(--sw-blue);
   color: #fff;
@@ -1391,7 +1402,7 @@
 
 @media (max-width: 575.98px) {
   .sw-testimonials-arrow { display: none; }
-  .sw-testimonials-track { padding: 1rem .75rem 1.5rem; margin: -1rem -.75rem -1.5rem; }
+  .sw-testimonials-track { padding: 1rem .5rem 1.5rem; margin: -1rem -.5rem -1.5rem; }
 }
 
 

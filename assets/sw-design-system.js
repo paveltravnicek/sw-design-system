@@ -167,10 +167,22 @@
     prev.addEventListener('click', () => track.scrollBy({ left: -cardStep(), behavior: 'smooth' }));
     next.addEventListener('click', () => track.scrollBy({ left:  cardStep(), behavior: 'smooth' }));
 
+    // Hover is tracked in JS (.is-hover), not left to CSS :hover — see
+    // the note above .sw-testimonials-arrow.is-hover in the stylesheet.
+    [prev, next].forEach(btn => {
+      btn.addEventListener('mouseenter', () => { if (!btn.disabled) btn.classList.add('is-hover'); });
+      btn.addEventListener('mouseleave', () => btn.classList.remove('is-hover'));
+    });
+
     const updateArrows = () => {
       const max = track.scrollWidth - track.clientWidth - 1;
       prev.disabled = track.scrollLeft <= 4;
       next.disabled = max <= 0 || track.scrollLeft >= max - 4;
+      // A click can disable a button while the mouse never actually
+      // leaves it — clear the hover class right here too, instead of
+      // waiting on a mouseleave event that may or may not still fire.
+      if (prev.disabled) prev.classList.remove('is-hover');
+      if (next.disabled) next.classList.remove('is-hover');
     };
     updateArrows();
 
