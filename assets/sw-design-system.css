@@ -1225,13 +1225,12 @@
 .sw-journey-body { padding-top: .6rem; }
 .sw-journey-kicker { margin: 0 0 .35rem; font-size: .92rem; font-weight: 700; letter-spacing: .01em; color: var(--sw-blue); }
 .sw-journey-name { margin: 0 0 .6rem; font-size: clamp(1.3rem, 2.2vw, 1.7rem); font-weight: 750; letter-spacing: -.01em; color: var(--sw-text); }
-.sw-journey-desc { margin: 0 0 1.25rem; max-width: 62ch; color: var(--sw-text-muted); font-size: 1rem; line-height: 1.65; }
+.sw-journey-desc { margin: 0 0 1.25rem; color: var(--sw-text-muted); font-size: 1rem; line-height: 1.65; }
 
 /* "Doporučujeme, pokud" — a second, subtler visual tier inside each step,
    distinguishing "the pitch" from "is this you". */
 .sw-journey-fit {
-  display: inline-block;
-  max-width: 46rem;
+  display: block;
   padding: 1.1rem 1.4rem;
   border-radius: var(--sw-radius-card);
   background: var(--sw-card-bg);
@@ -1259,7 +1258,6 @@
   .sw-journey-num { width: 3rem; height: 3rem; font-size: 1.15rem; }
   .sw-journey-marker-col { padding-right: 1rem; }
   .sw-journey-step:not(.sw-journey-step--last) .sw-journey-marker-col::after { left: 1.5rem; top: 3rem; }
-  .sw-journey-fit { display: block; max-width: none; }
 }
 
 
