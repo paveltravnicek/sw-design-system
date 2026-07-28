@@ -1327,14 +1327,16 @@
 
 /* ================================================================
    COMPONENT: TESTIMONIALS (native scroll-snap slider, no library)
-   Track is a scrollable flex row. The arrows sit in their own control
-   row ABOVE the track (not beside it) — they used to be flex siblings
-   of the track, which meant any padding/negative-margin added to the
-   track for shadow room could visually collide with them. Putting them
-   above removes that constraint entirely: the track can have as much
-   side padding as the shadow needs, with nothing next to it to bump
-   into. Works without JS too (native touch/trackpad/keyboard scroll),
-   the buttons are a progressive-enhancement convenience.
+   No box-shadow on the cards at all — that was the whole source of
+   the repeated clipping/overlap fight with the arrow buttons. Cards
+   get their presence from a tinted background instead (same technique
+   as the trust cards): a soft brand-blue tint in light mode, the
+   existing glassy --sw-card-bg in dark mode. Arrows are back to being
+   plain flex siblings left/right of the track — with no shadow, the
+   track needs no extra padding/negative-margin, so there's nothing
+   left for them to collide with.
+   Works without JS too (native touch/trackpad/keyboard scroll on the
+   track); the buttons are a progressive-enhancement convenience.
    Not a Bootstrap row/col layout on purpose — this is a horizontal
    scroller, a different UI need than the wrapping grids elsewhere,
    and Bootstrap doesn't ship a multi-item scroller primitive.
@@ -1342,21 +1344,17 @@
 .sw-testimonials-intro { max-width: 62ch; margin: 0 0 clamp(2rem, 4vw, 3rem); }
 .sw-testimonials-lead { margin: 1rem 0 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
 
-.sw-testimonials-controls { display: flex; justify-content: flex-end; gap: .75rem; margin-bottom: 2rem; }
+.sw-testimonials-slider { display: flex; align-items: center; gap: .75rem; }
 
 .sw-testimonials-track {
   display: flex;
   gap: 1.25rem;
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  /* Generous on all sides now that nothing sits beside the track — this
-     is purely about giving the (now gentler) card shadow room to render
-     without overflow-x:auto clipping it. Negative margin cancels the
-     padding's effect on surrounding layout, so the track still lines up
-     with the container edge like before. */
-  padding: 1.75rem 1.5rem 2rem;
-  margin: -1.75rem -1.5rem -2rem;
+  padding: .25rem .25rem 1rem;
   scrollbar-width: none;
 }
 .sw-testimonials-track::-webkit-scrollbar { display: none; }
@@ -1369,19 +1367,25 @@
   border-radius: var(--sw-radius-card);
   background: var(--sw-card-bg);
   border: 1px solid var(--sw-card-border);
-  /* A gentler, bespoke shadow — smaller blur than the shared
-     --sw-shadow-card (tuned for bigger, punchier cards elsewhere),
-     both because it reads softer next to other testimonial cards and
-     because a smaller blur needs less clipping-safe padding to render
-     cleanly in a scroll-snap track. */
-  box-shadow: 0 10px 28px rgba(16, 42, 80, .10);
-  -webkit-backdrop-filter: blur(var(--sw-card-blur));
-          backdrop-filter: blur(var(--sw-card-blur));
 }
-[data-bs-theme="dark"] .sw-surface--auto .sw-testimonial-card,
-.sw-surface--dark .sw-testimonial-card {
-  box-shadow: 0 14px 36px rgba(0, 0, 0, .3);
+/* Light mode: a soft brand-blue tint instead of a shadow to give the
+   card presence — same fix as the trust cards' decor earlier. */
+.sw-surface--light .sw-testimonial-card,
+.sw-surface--auto .sw-testimonial-card {
+  background: linear-gradient(155deg,
+    color-mix(in srgb, var(--sw-blue) 9%, #fff) 0%,
+    color-mix(in srgb, var(--sw-blue) 3%, #fff) 100%);
+  border-color: rgba(16, 42, 80, .10);
 }
+[data-bs-theme="dark"] .sw-surface--auto .sw-testimonial-card {
+  background: var(--sw-card-bg);
+  border-color: var(--sw-card-border);
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-surface--light .sw-testimonial-card,
+  .sw-surface--auto .sw-testimonial-card { background: #eef4fb; }
+}
+
 .sw-testimonial-stars { margin: 0 0 .75rem; color: var(--sw-blue); font-size: 1.05rem; letter-spacing: .1em; }
 .sw-testimonial-text { margin: 0 0 1.1rem; color: var(--sw-text); font-size: .96rem; line-height: 1.6; }
 .sw-testimonial-name { margin: 0; font-weight: 700; color: var(--sw-text); }
@@ -1415,8 +1419,7 @@
 .sw-testimonials-arrow:disabled { opacity: .35; cursor: default; pointer-events: none; }
 
 @media (max-width: 575.98px) {
-  .sw-testimonials-controls { display: none; }
-  .sw-testimonials-track { padding: 1.25rem .6rem 1.5rem; margin: -1.25rem -.6rem -1.5rem; }
+  .sw-testimonials-arrow { display: none; }
 }
 
 
