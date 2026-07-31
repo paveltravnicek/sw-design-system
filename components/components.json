@@ -28,6 +28,6 @@
     { "title": "Rozcestník služeb (nekompatibilní s Bootstrap)",  "file": "component-service-hub.html", "category": "hub" },
     { "title": "Reference", "file": "component-testimonials.html", "category": "testimonials" },
     { "title": "CTA box (nekompatibilní s Bootstrap)",                   "file": "component-cta.html",         "category": "cta" },
-    { "title": "Aktuality (2 karty)", "file": "component-news.html", "category": "news" }
+    { "title": "Aktuality (dynamický výpis příspěvků)", "file": "component-news.html", "category": "news" }
   ]
 }

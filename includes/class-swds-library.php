@@ -77,7 +77,7 @@ class SWDS_Library {
                 array( 'title' => 'Rozcestník služeb (nekompatibilní s Bootstrap)',  'file' => 'component-service-hub.html', 'category' => 'hub' ),
                 array( 'title' => 'Reference', 'file' => 'component-testimonials.html', 'category' => 'testimonials' ),
                 array( 'title' => 'CTA box (nekompatibilní s Bootstrap)',                  'file' => 'component-cta.html',         'category' => 'cta' ),
-                array( 'title' => 'Aktuality (2 karty)', 'file' => 'component-news.html', 'category' => 'news' ),
+                array( 'title' => 'Aktuality (dynamický výpis příspěvků)', 'file' => 'component-news.html', 'category' => 'news' ),
             ),
         );
     }
