@@ -1510,15 +1510,17 @@
 
 /* ================================================================
    FOOTER
-   Always a dark surface regardless of the site's own light/dark
-   toggle (the footer itself hosts that toggle) — colors here are
-   fixed, not routed through --sw-text/--sw-text-muted, since those
-   are meant for content that flips with the surrounding surface.
-   Structure (row/col-lg-4/col-sm-6) was already plain Bootstrap and
-   untouched; this only adds hover states and brand color where the
-   original had none.
+   Same surface system as every other component — put sw-surface--dark
+   (or --light / --auto) on the section and everything here follows
+   via --sw-text/--sw-text-muted, same as the rest of the library. The
+   actual background comes from wrapping the <footer> in .sw-canvas
+   (the section itself stays transparent, per the canvas convention) —
+   swap the surface class and the footer re-themes with it, no colors
+   are hardcoded here. Structure (row/col-lg-4/col-sm-6) was already
+   plain Bootstrap and untouched; this only adds hover states and
+   brand color where the original had none.
    ================================================================ */
-.sw-footer-link { color: rgba(255, 255, 255, .85); text-decoration: none; transition: color .2s ease; }
+.sw-footer-link { color: var(--sw-text); text-decoration: none; transition: color .2s ease; }
 .sw-footer-link:hover { color: var(--sw-blue-2, #5cc8ff); text-decoration: underline; }
 
 .sw-footer-list { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; gap: .5rem; }
@@ -1533,11 +1535,11 @@
   color: var(--sw-blue-2, #5cc8ff);
 }
 
-.sw-footer-meta { color: rgba(255, 255, 255, .6); font-size: .9rem; line-height: 1.6; }
+.sw-footer-meta { color: var(--sw-text-muted); font-size: .9rem; line-height: 1.6; }
 
 .sw-footer-social {
   display: inline-flex;
-  color: rgba(255, 255, 255, .85);
+  color: var(--sw-text);
   transition: color .2s ease, transform .2s ease;
 }
 .sw-footer-social:hover { color: var(--sw-blue-2, #5cc8ff); transform: translateY(-2px); }
@@ -1557,7 +1559,9 @@
    green/red); recolored to the brand gradient so the floating widget
    reads as part of the same site, not a bolted-on plugin default. The
    close state keeps a distinct (but still on-brand) dark slate rather
-   than alarm-red, since dismissing a chat panel isn't an error. */
+   than alarm-red, since dismissing a chat panel isn't an error. This
+   floating widget isn't scoped to any one section's surface, so it
+   keeps a fixed brand treatment rather than reading --sw-text. */
 .sw-bubble-icon {
   color: #fff;
   background: linear-gradient(135deg, var(--sw-blue), #38bdf8);
