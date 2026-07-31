@@ -1451,6 +1451,64 @@
 
 
 /* ================================================================
+   COMPONENT: NEWS (intro column + photo cards with dark caption band)
+   Layout is Bootstrap .row/.col-xl-4/.col-xl-8 for the split, and
+   .row/.col-md-6 for the two cards — no custom grid. The card's
+   bottom caption band is a fixed dark color regardless of surface
+   mode (light or dark page) — it needs strong contrast for the white
+   text sitting directly on a photo-adjacent block, the same reasoning
+   as the hub's photo cards.
+   ================================================================ */
+.sw-news-lead { margin: 1rem 0 1.25rem; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
+.sw-news-link { display: inline-flex; align-items: center; gap: .4rem; font-weight: 750; color: var(--sw-blue); text-decoration: underline; }
+.sw-news-link:hover { color: var(--sw-blue-2, #38bdf8); }
+
+.sw-news-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--sw-radius-card);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--sw-shadow-card);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.sw-news-card:hover { transform: translateY(-4px); }
+.sw-news-card:focus-visible { outline: 2px solid var(--sw-blue); outline-offset: 3px; }
+
+.sw-news-media { position: relative; aspect-ratio: 4 / 3; flex-shrink: 0; }
+.sw-news-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.sw-news-badge {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  z-index: 2;
+  padding: .35rem .85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .92);
+  color: #16233a;
+  font-size: .78rem;
+  font-weight: 750;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .18);
+}
+
+.sw-news-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.5rem 1.75rem;
+  background: #0e1a2b;
+  color: #fff;
+}
+.sw-news-date { margin: 0 0 .5rem; font-size: .85rem; color: rgba(255, 255, 255, .65); }
+.sw-news-title { margin: 0; font-size: 1.15rem; font-weight: 750; line-height: 1.35; color: #fff; }
+.sw-news-spacer { flex: 1; min-height: .75rem; }
+.sw-news-more { display: inline-flex; align-items: center; gap: .35rem; font-size: .92rem; font-weight: 750; color: #fff; text-decoration: underline; }
+
+
+/* ================================================================
    REDUCED MOTION
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {

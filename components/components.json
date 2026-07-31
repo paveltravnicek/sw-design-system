@@ -8,7 +8,8 @@
     { "key": "faq",     "label": "Časté dotazy (FAQ)" },
     { "key": "hub",     "label": "Rozcestník služeb" },
     { "key": "testimonials", "label": "Reference" },
-    { "key": "cta",     "label": "Výzvy k akci (CTA)" }
+    { "key": "cta",     "label": "Výzvy k akci (CTA)" },
+    { "key": "news",    "label": "Aktuality / blog" }
   ],
   "components": [
     { "title": "Hero s mockupem (nekompatibilní s Bootstrap)",        "file": "component-hero.html",        "category": "hero" },
@@ -26,6 +27,7 @@
     { "title": "Časté dotazy (nekompatibilní s Bootstrap)", "file": "component-faq.html",         "category": "faq" },
     { "title": "Rozcestník služeb (nekompatibilní s Bootstrap)",  "file": "component-service-hub.html", "category": "hub" },
     { "title": "Reference", "file": "component-testimonials.html", "category": "testimonials" },
-    { "title": "CTA box (nekompatibilní s Bootstrap)",                   "file": "component-cta.html",         "category": "cta" }
+    { "title": "CTA box (nekompatibilní s Bootstrap)",                   "file": "component-cta.html",         "category": "cta" },
+    { "title": "Aktuality (2 karty)", "file": "component-news.html", "category": "news" }
   ]
 }
