@@ -59,6 +59,7 @@ class SWDS_Library {
                 array( 'key' => 'testimonials', 'label' => 'Reference' ),
                 array( 'key' => 'cta',     'label' => 'Výzvy k akci (CTA)' ),
                 array( 'key' => 'news',    'label' => 'Aktuality / blog' ),
+                array( 'key' => 'footer',  'label' => 'Zápatí' ),
             ),
             'components' => array(
                 array( 'title' => 'Hero s mockupem (nekompatibilní s Bootstrap)',        'file' => 'component-hero.html',        'category' => 'hero' ),
@@ -78,6 +79,7 @@ class SWDS_Library {
                 array( 'title' => 'Reference', 'file' => 'component-testimonials.html', 'category' => 'testimonials' ),
                 array( 'title' => 'CTA box (nekompatibilní s Bootstrap)',                  'file' => 'component-cta.html',         'category' => 'cta' ),
                 array( 'title' => 'Aktuality (dynamický výpis příspěvků)', 'file' => 'component-news.html', 'category' => 'news' ),
+                array( 'title' => 'Zápatí webu', 'file' => 'component-footer.html', 'category' => 'footer' ),
             ),
         );
     }

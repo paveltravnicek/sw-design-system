@@ -1509,6 +1509,70 @@
 
 
 /* ================================================================
+   FOOTER
+   Always a dark surface regardless of the site's own light/dark
+   toggle (the footer itself hosts that toggle) — colors here are
+   fixed, not routed through --sw-text/--sw-text-muted, since those
+   are meant for content that flips with the surrounding surface.
+   Structure (row/col-lg-4/col-sm-6) was already plain Bootstrap and
+   untouched; this only adds hover states and brand color where the
+   original had none.
+   ================================================================ */
+.sw-footer-link { color: rgba(255, 255, 255, .85); text-decoration: none; transition: color .2s ease; }
+.sw-footer-link:hover { color: var(--sw-blue-2, #5cc8ff); text-decoration: underline; }
+
+.sw-footer-list { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; gap: .5rem; }
+
+.sw-footer-heading {
+  display: inline-block;
+  margin-bottom: .25rem;
+  font-size: .78rem;
+  font-weight: 750;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--sw-blue-2, #5cc8ff);
+}
+
+.sw-footer-meta { color: rgba(255, 255, 255, .6); font-size: .9rem; line-height: 1.6; }
+
+.sw-footer-social {
+  display: inline-flex;
+  color: rgba(255, 255, 255, .85);
+  transition: color .2s ease, transform .2s ease;
+}
+.sw-footer-social:hover { color: var(--sw-blue-2, #5cc8ff); transform: translateY(-2px); }
+
+/* Theme toggle switch — Bootstrap's default "on" color rarely matches a
+   brand palette; recolor it to ours. */
+.sw-footer-theme-toggle .form-check-input:checked {
+  background-color: var(--sw-blue);
+  border-color: var(--sw-blue);
+}
+.sw-footer-theme-toggle .form-check-input:focus {
+  border-color: var(--sw-blue);
+  box-shadow: 0 0 0 .25rem var(--sw-blue-glow, rgba(0, 150, 226, .25));
+}
+
+/* Support bubble — was generic Bootstrap bg-success/bg-danger (plain
+   green/red); recolored to the brand gradient so the floating widget
+   reads as part of the same site, not a bolted-on plugin default. The
+   close state keeps a distinct (but still on-brand) dark slate rather
+   than alarm-red, since dismissing a chat panel isn't an error. */
+.sw-bubble-icon {
+  color: #fff;
+  background: linear-gradient(135deg, var(--sw-blue), #38bdf8);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.sw-bubble-icon--close {
+  background: linear-gradient(135deg, #445168, #2c3547);
+}
+a:hover .sw-bubble-icon,
+button:hover .sw-bubble-icon {
+  transform: scale(1.06);
+}
+
+
+/* ================================================================
    REDUCED MOTION
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {

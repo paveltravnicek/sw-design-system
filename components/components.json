@@ -9,7 +9,8 @@
     { "key": "hub",     "label": "Rozcestník služeb" },
     { "key": "testimonials", "label": "Reference" },
     { "key": "cta",     "label": "Výzvy k akci (CTA)" },
-    { "key": "news",    "label": "Aktuality / blog" }
+    { "key": "news",    "label": "Aktuality / blog" },
+    { "key": "footer",  "label": "Zápatí" }
   ],
   "components": [
     { "title": "Hero s mockupem (nekompatibilní s Bootstrap)",        "file": "component-hero.html",        "category": "hero" },
@@ -28,6 +29,7 @@
     { "title": "Rozcestník služeb (nekompatibilní s Bootstrap)",  "file": "component-service-hub.html", "category": "hub" },
     { "title": "Reference", "file": "component-testimonials.html", "category": "testimonials" },
     { "title": "CTA box (nekompatibilní s Bootstrap)",                   "file": "component-cta.html",         "category": "cta" },
-    { "title": "Aktuality (dynamický výpis příspěvků)", "file": "component-news.html", "category": "news" }
+    { "title": "Aktuality (dynamický výpis příspěvků)", "file": "component-news.html", "category": "news" },
+    { "title": "Zápatí webu", "file": "component-footer.html", "category": "footer" }
   ]
 }
