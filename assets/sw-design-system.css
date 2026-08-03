@@ -1577,6 +1577,64 @@ button:hover .sw-bubble-icon {
 
 
 /* ================================================================
+   SITE-SPECIFIC — NOT A LIBRARY COMPONENT
+   News tile: styles the output of one specific LiveCanvas "dynamic
+   view" template (used by [lc_get_posts] in the Aktuality section).
+   Deliberately not exposed in components.json / the plugin's
+   component library — this is a one-off skin for this site's own
+   post-loop template, not a reusable block. Same visual language as
+   the rest of the library (brand badge, dark-over-photo legibility,
+   arrow "read more" link) under its own sw-newstile-* names so it
+   can't collide with — or be mistaken for — the general .sw-news-*
+   library component.
+   ================================================================ */
+.sw-newstile {
+  padding: 1.75rem;
+  padding-top: clamp(3.5rem, 9vw, 5.5rem);
+  min-height: 320px;
+  border-radius: var(--sw-radius-card);
+  color: #fff;
+  overflow: hidden;
+  transition: transform .25s ease;
+}
+.sw-newstile:hover { transform: translateY(-4px); }
+
+.sw-newstile-media { border-radius: var(--sw-radius-card); background: #0a1628; }
+.sw-newstile-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(6, 15, 30, .92) 0%, rgba(6, 15, 30, .55) 48%, rgba(6, 15, 30, .18) 100%);
+}
+.sw-newstile-img { display: block; object-fit: cover; mix-blend-mode: overlay; transition: transform .4s ease; }
+.sw-newstile:hover .sw-newstile-img { transform: scale(1.06); }
+
+.sw-newstile-badge-pill {
+  display: inline-block;
+  padding: .35rem .85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .92);
+  color: #16233a;
+  font-size: .78rem;
+  font-weight: 750;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .18);
+}
+
+.sw-newstile-date { margin: 0 0 .5rem; font-size: .85rem; color: rgba(255, 255, 255, .7); }
+.sw-newstile-title { margin: 0 0 1rem; font-size: 1.2rem; font-weight: 750; line-height: 1.3; color: #fff; }
+.sw-newstile-more {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .92rem;
+  font-weight: 750;
+  color: #fff;
+  text-decoration: underline;
+}
+.sw-newstile-more:hover { color: var(--sw-blue-2, #5cc8ff); }
+
+
+/* ================================================================
    REDUCED MOTION
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {
