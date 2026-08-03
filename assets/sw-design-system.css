@@ -1592,7 +1592,7 @@ button:hover .sw-bubble-icon {
   padding: 1.75rem;
   padding-top: clamp(3.5rem, 9vw, 5.5rem);
   height: 100%;
-  min-height: 320px;
+  min-height: 440px;
   border-radius: var(--sw-radius-card);
   color: #fff;
   overflow: hidden;
