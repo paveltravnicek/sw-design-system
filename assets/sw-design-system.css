@@ -1163,7 +1163,13 @@
   .sw-hub-plain-inner .sw-hub-spacer { display: none; flex: 0 0 0; min-height: 0; }
 }
 
-@media (max-width: 767.98px) {
+/* Badge sits static/inline above the title through the whole md tier
+   (not just <768px) — measured that the corner-positioned badge
+   collides with the title's first line specifically at 768–991px
+   (card ~336px wide, title wraps close enough to reach it); at 992px
+   the container widens the card to ~456px and the collision resolves
+   on its own, so the corner badge is safe again from there up. */
+@media (max-width: 991.98px) {
   .sw-hub-badge {
     position: static;
     display: inline-flex;
