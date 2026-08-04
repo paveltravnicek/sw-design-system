@@ -26,7 +26,7 @@
     { "title": "3sloupcová tabulka s cenami (nekompatibilní s Bootstrap)", "file": "component-pricing-3col.html", "category": "pricing" },
     { "title": "4sloupcová tabulka s cenami (nekompatibilní s Bootstrap)", "file": "component-pricing-4col.html", "category": "pricing" },
     { "title": "Časté dotazy (nekompatibilní s Bootstrap)", "file": "component-faq.html",         "category": "faq" },
-    { "title": "Rozcestník služeb (nekompatibilní s Bootstrap)",  "file": "component-service-hub.html", "category": "hub" },
+    { "title": "Rozcestník služeb",  "file": "component-service-hub.html", "category": "hub" },
     { "title": "Reference", "file": "component-testimonials.html", "category": "testimonials" },
     { "title": "CTA box (nekompatibilní s Bootstrap)",                   "file": "component-cta.html",         "category": "cta" },
     { "title": "Aktuality (dynamický výpis příspěvků)", "file": "component-news.html", "category": "news" },

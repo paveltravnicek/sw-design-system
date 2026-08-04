@@ -1037,12 +1037,6 @@
    not a third equal peer.
    ================================================================ */
 
-.sw-hub-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-}
-
 .sw-hub-card {
   position: relative;
   display: flex;
@@ -1116,13 +1110,19 @@
 }
 .sw-hub-card:hover .sw-hub-link::after { transform: translateX(4px); }
 
-/* ---------- Plain variant (supporting service — de-emphasized) ---------- */
+/* ---------- Plain variant (supporting service — de-emphasized) ----------
+   Stays de-emphasized (own row, plainer style), never becomes a third
+   equal-weight column. Its internal layout used to switch between
+   "stacked" and "one flowing row" purely by viewport width via
+   flex-wrap — which looked fine at the extremes (narrow mobile, wide
+   desktop) but reflowed unpredictably — even reordering which line
+   things landed on — at in-between widths, since the same card width
+   can happen at very different viewports depending on the grid it
+   sits in. A container query fixes this at the root: it reacts to the
+   CARD's own measured width, not the viewport, so there's no longer an
+   ambiguous middle state — it's cleanly either stacked or one row. */
 .sw-hub-card--plain {
-  grid-column: 1 / -1;
-  flex-direction: row;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: .3rem 1.5rem;
+  container-type: inline-size;
   padding: 1.4rem 1.75rem;
   background: var(--sw-card-bg);
   border: 1px solid var(--sw-card-border);
@@ -1131,7 +1131,13 @@
           backdrop-filter: blur(var(--sw-card-blur));
 }
 .sw-hub-card--plain:hover { border-color: var(--sw-surface-hover-border, rgba(255,255,255,.28)); }
-.sw-hub-card--plain .sw-hub-head { margin-bottom: 0; flex: 1 1 260px; }
+.sw-hub-plain-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .3rem 1.5rem;
+}
+.sw-hub-plain-inner .sw-hub-head { margin-bottom: 0; }
 .sw-hub-icon--sm {
   width: 2.1rem; height: 2.1rem;
   background: color-mix(in srgb, var(--sw-blue) 14%, transparent);
@@ -1141,24 +1147,28 @@
   .sw-hub-icon--sm { background: rgba(0,150,226,.14); }
 }
 .sw-hub-name--sm { font-size: 1.05rem; color: var(--sw-text); }
-.sw-hub-tagline--sm { margin: 0; flex: 1 1 220px; font-size: .88rem; font-weight: 550; color: var(--sw-blue); }
-.sw-hub-desc--sm { margin: 0; flex: 2 1 320px; font-size: .88rem; line-height: 1.5; color: var(--sw-text-muted); }
-.sw-hub-card--plain .sw-hub-spacer { flex: 0 0 0; min-height: 0; display: none; }
+.sw-hub-tagline--sm { margin: 0; font-size: .88rem; font-weight: 550; color: var(--sw-blue); }
+.sw-hub-desc--sm { margin: 0; font-size: .88rem; line-height: 1.5; color: var(--sw-text-muted); }
+.sw-hub-plain-inner .sw-hub-spacer { display: block; flex: 1; min-height: .75rem; }
 .sw-hub-link--sm { flex-shrink: 0; color: var(--sw-blue); font-size: .9rem; }
 .sw-hub-link--sm::after { color: var(--sw-blue); }
 
+/* Card only switches to one flowing row once it's genuinely wide enough
+   for that to look comfortable — measured empirically, not guessed. */
+@container (min-width: 1000px) {
+  .sw-hub-plain-inner { flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .sw-hub-plain-inner .sw-hub-head { flex: 1 1 260px; }
+  .sw-hub-plain-inner .sw-hub-tagline--sm { flex: 1 1 220px; }
+  .sw-hub-plain-inner .sw-hub-desc--sm { flex: 2 1 320px; }
+  .sw-hub-plain-inner .sw-hub-spacer { display: none; flex: 0 0 0; min-height: 0; }
+}
+
 @media (max-width: 767.98px) {
-  .sw-hub-grid { grid-template-columns: 1fr; }
   .sw-hub-badge {
     position: static;
     display: inline-flex;
     margin-bottom: .85rem;
   }
-  .sw-hub-card--plain { flex-direction: column; align-items: flex-start; }
-  .sw-hub-card--plain .sw-hub-head,
-  .sw-hub-card--plain .sw-hub-tagline--sm,
-  .sw-hub-card--plain .sw-hub-desc--sm { flex: none; }
-  .sw-hub-card--plain .sw-hub-spacer { display: block; flex: 1; min-height: .75rem; }
 }
 
 
