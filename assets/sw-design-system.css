@@ -1373,6 +1373,7 @@
           mask-image: none;
 }
 .sw-testimonial-card {
+  height: 100%;
   width: min(82vw, 320px);
   padding: 1.75rem;
   border-radius: var(--sw-radius-card);
