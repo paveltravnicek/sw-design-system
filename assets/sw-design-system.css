@@ -355,17 +355,6 @@
   gap: clamp(2rem, 5vw, 4rem);
   align-items: center;
 }
-/* The gallery visual needs less width than the big single mockup, so give
-   the copy column more room — important for long headlines (see the
-   --wide heading modifier). Scoped to this variant, and to widths where
-   the grid is still 2 columns — :has() has higher specificity than the
-   plain-class mobile override below, so it must stay inside this same
-   min-width guard or it would outrank the single-column collapse. */
-@media (min-width: 992px) {
-  .sw-hero-grid:has(.sw-hero-gallery) {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
-  }
-}
 .sw-hero-copy { min-width: 0; }
 
 .sw-hero-stage {
