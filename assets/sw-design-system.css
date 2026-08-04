@@ -1605,7 +1605,7 @@ button:hover .sw-bubble-icon {
 }
 .sw-newstile:hover { transform: translateY(-4px); }
 
-.sw-newstile-media { position: relative; aspect-ratio: 1 / 1; flex-shrink: 0; overflow: hidden; }
+.sw-newstile-media { position: relative; aspect-ratio: 3 / 2; flex-shrink: 0; overflow: hidden; }
 .sw-newstile-img {
   display: block;
   width: 100%;
@@ -1615,27 +1615,22 @@ button:hover .sw-bubble-icon {
 }
 .sw-newstile:hover .sw-newstile-img { transform: scale(1.06); }
 
+/* [lc_the_tags] renders its own Bootstrap .badge.rounded-pill.bg-info
+   span — wrapping THAT in a second pill of our own doubled up (pill
+   inside a pill, two backgrounds fighting). Position this element, but
+   don't give it its own background/padding — recolor the badge the
+   shortcode already generates instead. */
 .sw-newstile-badge-pill {
   position: absolute;
   top: 1rem; right: 1rem;
   z-index: 2;
-  display: inline-block;
-  padding: .35rem .85rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--sw-blue), #38bdf8);
-  color: #fff;
-  font-size: .78rem;
-  font-weight: 750;
-  box-shadow: 0 8px 22px var(--sw-blue-glow, rgba(0, 150, 226, .4));
 }
-/* [lc_the_tags] renders its own <a> per tag — force it to inherit this
-   pill's white text/no-underline rather than whatever link color the
-   theme gives anchors by default (that mismatch is what made the pill
-   look empty: same-hue text on a same-hue background). */
-.sw-newstile-badge-pill,
-.sw-newstile-badge-pill a {
+.sw-newstile-badge-pill a { text-decoration: none; }
+.sw-newstile-badge-pill .badge {
+  background-color: var(--sw-blue) !important;
+  background-image: linear-gradient(135deg, var(--sw-blue), #38bdf8) !important;
   color: #fff !important;
-  text-decoration: none !important;
+  box-shadow: 0 8px 22px var(--sw-blue-glow, rgba(0, 150, 226, .4));
 }
 
 .sw-newstile-body {
@@ -1647,16 +1642,6 @@ button:hover .sw-bubble-icon {
 .sw-newstile-date { margin: 0 0 .5rem; font-size: .85rem; color: var(--sw-text-muted); }
 .sw-newstile-title { margin: 0; font-size: 1.15rem; font-weight: 750; line-height: 1.3; color: var(--sw-text); }
 .sw-newstile-cta { margin-top: auto; padding-top: 1rem; }
-.sw-newstile-more {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  font-size: .95rem;
-  font-weight: 750;
-  color: var(--sw-blue);
-}
-.sw-newstile-more::after { content: "→"; transition: transform .2s ease; }
-.sw-newstile:hover .sw-newstile-more::after { transform: translateX(4px); }
 
 
 /* ================================================================
