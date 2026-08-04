@@ -1041,6 +1041,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  height: 100%;
   border-radius: var(--sw-radius-card);
   overflow: hidden;
   text-decoration: none;
