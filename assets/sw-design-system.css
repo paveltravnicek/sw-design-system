@@ -349,12 +349,6 @@
    overflow-x: clip keeps vertical shadows intact, unlike overflow:hidden. */
 .sw-hero { overflow-x: clip; }
 
-.sw-hero-grid {
-  display: grid;
-  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
-  gap: clamp(2rem, 5vw, 4rem);
-  align-items: center;
-}
 .sw-hero-copy { min-width: 0; }
 
 .sw-hero-stage {
@@ -442,7 +436,6 @@
 }
 
 @media (max-width: 991.98px) {
-  .sw-hero-grid       { grid-template-columns: 1fr; }
   .sw-h-display       { max-width: 14ch; }
   .sw-hero-stage      { perspective: none; max-width: 620px; }
   .sw-browser         { transform: none; }

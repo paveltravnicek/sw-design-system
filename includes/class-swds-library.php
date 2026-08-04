@@ -62,7 +62,7 @@ class SWDS_Library {
                 array( 'key' => 'footer',  'label' => 'Zápatí' ),
             ),
             'components' => array(
-                array( 'title' => 'Hero s mockupem (nekompatibilní s Bootstrap)',        'file' => 'component-hero.html',        'category' => 'hero' ),
+                array( 'title' => 'Hero s mockupem',        'file' => 'component-hero.html',        'category' => 'hero' ),
                 array( 'title' => 'Hero se statickým obrázkem',  'file' => 'component-hero-static.html', 'category' => 'hero' ),
                 array( 'title' => 'Hero s mini galerií',    'file' => 'component-hero-gallery.html','category' => 'hero' ),
                 array( 'title' => '3 prvky důvěryhodnosti (nekompatibilní s Bootstrap)', 'file' => 'component-trust-3col.html',  'category' => 'trust' ),
