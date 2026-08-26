@@ -1673,7 +1673,7 @@ button:hover .sw-bubble-icon {
    a visual afterthought. Layout is Bootstrap .row/.row-cols-2/
    .row-cols-lg-4 — no custom grid.
    ================================================================ */
-.sw-contact-intro { max-width: 40rem; }
+.sw-contact-intro { max-width: 40rem; margin: 0 auto clamp(2rem, 4vw, 3rem); }
 .sw-contact-lead { margin: 1rem 0 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.6; }
 
 .sw-contact-card {
