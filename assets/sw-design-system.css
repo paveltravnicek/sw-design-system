@@ -1686,7 +1686,12 @@ button:hover .sw-bubble-icon {
 .sw-contact-card--muted .sw-contact-icon { border: 1px solid var(--sw-card-border); }
 .sw-contact-card--muted .sw-contact-name { color: var(--sw-text); font-weight: 650; }
 
-.sw-contact-meta {
+/* Specificity is deliberately raised (.sw-contact scope) so this survives
+   Bootstrap's own `.row { margin-top: calc(-1 * var(--bs-gutter-y)) }`.
+   Both are single-class rules, so whichever stylesheet loads last wins —
+   and when the theme loads Bootstrap after this file, the divider's top
+   spacing was being zeroed out and the rule collapsed onto the tiles. */
+.sw-contact .sw-contact-meta {
   margin-top: clamp(2.5rem, 5vw, 4rem);
   padding-top: clamp(1.75rem, 3vw, 2.5rem);
   border-top: 1px solid var(--sw-card-border);
