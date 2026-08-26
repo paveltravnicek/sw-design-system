@@ -1751,6 +1751,34 @@ button:hover .sw-bubble-icon {
 
 
 /* ================================================================
+   COMPONENT: REFERENCES GALLERY (full portfolio grid)
+   The screenshots themselves are untouched — they already carry their
+   own framing baked into the image file — this only handles the
+   outer card treatment (radius, shadow, hover) and caption typography.
+   Plain row/col-sm-6/col-xl-4 grid, no custom grid.
+   ================================================================ */
+.sw-refs-title { margin: 0 0 clamp(1.5rem, 3vw, 2.25rem); }
+
+.sw-refcard { margin: 0; }
+.sw-refcard-media {
+  display: block;
+  border-radius: var(--sw-radius-card);
+  overflow: hidden;
+  box-shadow: var(--sw-shadow-card);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.sw-refcard-media img { display: block; width: 100%; height: auto; }
+.sw-refcard-media:hover,
+.sw-refcard-media:focus-visible { transform: translateY(-4px); box-shadow: 0 26px 60px rgba(0, 0, 0, .18); }
+
+.sw-refcard-caption { margin-top: 1rem; text-align: center; }
+.sw-refcard-name { display: block; font-size: .92rem; color: var(--sw-text-muted); margin-bottom: .2rem; }
+.sw-refcard-link { display: inline-block; font-weight: 700; color: var(--sw-blue); text-decoration: none; }
+.sw-refcard-link:hover { text-decoration: underline; color: var(--sw-blue-2, #38bdf8); }
+.sw-refcard-link + .sw-refcard-link { margin-left: .6rem; }
+
+
+/* ================================================================
    REDUCED MOTION
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {

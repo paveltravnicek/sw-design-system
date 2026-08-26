@@ -30,6 +30,7 @@
     { "title": "Časté dotazy (nekompatibilní s Bootstrap)", "file": "component-faq.html",         "category": "faq" },
     { "title": "Rozcestník služeb",  "file": "component-service-hub.html", "category": "hub" },
     { "title": "Reference", "file": "component-testimonials.html", "category": "testimonials" },
+    { "title": "Kompletní reference", "file": "component-references-full.html", "category": "testimonials" },
     { "title": "CTA box (nekompatibilní s Bootstrap)",                   "file": "component-cta.html",         "category": "cta" },
     { "title": "Aktuality (dynamický výpis příspěvků)", "file": "component-news.html", "category": "news" },
     { "title": "Kontaktní sekce", "file": "component-contact.html", "category": "contact" },

@@ -79,6 +79,7 @@ class SWDS_Library {
                 array( 'title' => 'Časté dotazy (nekompatibilní s Bootstrap)', 'file' => 'component-faq.html',         'category' => 'faq' ),
                 array( 'title' => 'Rozcestník služeb',  'file' => 'component-service-hub.html', 'category' => 'hub' ),
                 array( 'title' => 'Reference', 'file' => 'component-testimonials.html', 'category' => 'testimonials' ),
+                array( 'title' => 'Kompletní reference', 'file' => 'component-references-full.html', 'category' => 'testimonials' ),
                 array( 'title' => 'CTA box (nekompatibilní s Bootstrap)',                  'file' => 'component-cta.html',         'category' => 'cta' ),
                 array( 'title' => 'Aktuality (dynamický výpis příspěvků)', 'file' => 'component-news.html', 'category' => 'news' ),
                 array( 'title' => 'Kontaktní sekce', 'file' => 'component-contact.html', 'category' => 'contact' ),
