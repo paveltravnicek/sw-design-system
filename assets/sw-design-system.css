@@ -352,6 +352,14 @@
 /* Hero: clip horizontal overflow only (the phone sticks out to the right).
    overflow-x: clip keeps vertical shadows intact, unlike overflow:hidden. */
 .sw-hero { overflow-x: clip; }
+/* Text-only hero has no image/mockup to balance the layout, so this
+   optical effect is much more visible here than in the other heroes:
+   a large, tight-line-height display heading's own font leading reads
+   as noticeably more "top space" than the lead paragraph's own
+   baseline-to-box-edge space below it, even though padding-block
+   itself is perfectly symmetric (verified: 68px both sides at 1400px).
+   Trimming padding-top compensates for that visually. */
+.sw-hero-text { padding-top: calc(var(--sw-section-py) * .72); }
 
 .sw-hero-copy { min-width: 0; }
 
