@@ -10,6 +10,7 @@
     { "key": "testimonials", "label": "Reference" },
     { "key": "cta",     "label": "Výzvy k akci (CTA)" },
     { "key": "news",    "label": "Aktuality / blog" },
+    { "key": "contact", "label": "Kontakt" },
     { "key": "footer",  "label": "Zápatí" }
   ],
   "components": [
@@ -31,6 +32,7 @@
     { "title": "Reference", "file": "component-testimonials.html", "category": "testimonials" },
     { "title": "CTA box (nekompatibilní s Bootstrap)",                   "file": "component-cta.html",         "category": "cta" },
     { "title": "Aktuality (dynamický výpis příspěvků)", "file": "component-news.html", "category": "news" },
+    { "title": "Kontaktní sekce", "file": "component-contact.html", "category": "contact" },
     { "title": "Zápatí webu", "file": "component-footer.html", "category": "footer" }
   ]
 }
