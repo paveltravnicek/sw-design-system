@@ -274,6 +274,10 @@
   line-height: 1.65;
   text-wrap: pretty;
 }
+/* For contexts where an outer col-* already sets the width budget (see
+   the text-only hero) — without this, the lead's own fixed 38rem cap
+   fights the column's width instead of using the room it was given. */
+.sw-lead--wide { max-width: none; }
 
 .sw-actions {
   display: flex;
