@@ -3,7 +3,7 @@
  * Plugin Name:       SW Design System
  * Plugin URI:        https://smart-websites.cz/
  * Description:       Konfigurovatelný design systém pro weby Smart Websites. Nastavte barvy, dark mode, tvarosloví, stíny a animace v jednom místě — plugin z toho vygeneruje CSS. Obsahuje knihovnu komponent a nápovědu.
- * Version:           2.17.0
+ * Version:           2.17.1
  * Author:            Smart Websites
  * Author URI:        https://smart-websites.cz/
  * License:           GPL-2.0-or-later
@@ -34,19 +34,42 @@ if ( file_exists( __DIR__ . '/plugin-update-checker/plugin-update-checker.php' )
     }
 }
 
-define( 'SWDS_VERSION', '2.17.0' );
+define( 'SWDS_VERSION', '2.17.1' );
 define( 'SWDS_FILE', __FILE__ );
 define( 'SWDS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SWDS_URL', plugin_dir_url( __FILE__ ) );
 define( 'SWDS_OPTION', 'swds_settings' );        // wp_options key
 define( 'SWDS_UPLOAD_SUBDIR', 'sw-ds' );          // wp-content/uploads/sw-ds/
 
-require_once SWDS_DIR . 'includes/class-swds-tokens.php';
-require_once SWDS_DIR . 'includes/class-swds-presets.php';
-require_once SWDS_DIR . 'includes/class-swds-generator.php';
-require_once SWDS_DIR . 'includes/class-swds-library.php';
-require_once SWDS_DIR . 'includes/class-swds-settings.php';
-require_once SWDS_DIR . 'includes/class-swds-frontend.php';
+/**
+ * Lazy class loading.
+ *
+ * A normal front-end request only ever touches SWDS_Frontend and a few
+ * cheap SWDS_Generator methods (exists/url/version). The remaining
+ * classes — tokens, presets, the component library and the settings
+ * screen — are admin-only, together roughly 60 kB of PHP that used to be
+ * require_once'd on every single page load for nothing.
+ *
+ * An autoloader is used rather than wrapping the requires in is_admin(),
+ * because some paths legitimately need an "admin" class outside the admin
+ * screen (SWDS_Generator::generate() needs SWDS_Tokens for its defaults,
+ * and that can run on any request right after a version bump). This way
+ * each class loads exactly when first referenced, with no call site left
+ * to overlook.
+ */
+spl_autoload_register( function ( $class ) {
+    static $map = array(
+        'SWDS_Tokens'    => 'class-swds-tokens.php',
+        'SWDS_Presets'   => 'class-swds-presets.php',
+        'SWDS_Generator' => 'class-swds-generator.php',
+        'SWDS_Library'   => 'class-swds-library.php',
+        'SWDS_Settings'  => 'class-swds-settings.php',
+        'SWDS_Frontend'  => 'class-swds-frontend.php',
+    );
+    if ( isset( $map[ $class ] ) ) {
+        require_once SWDS_DIR . 'includes/' . $map[ $class ];
+    }
+} );
 
 /**
  * Boot the plugin.

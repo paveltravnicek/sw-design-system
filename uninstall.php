@@ -9,6 +9,10 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 delete_option( 'swds_settings' );
 delete_option( 'swds_version' );
 
+// Remove cached component library (both the manifest and the category map).
+delete_transient( 'swds_library_cache' );
+delete_transient( 'swds_library_cache_cats' );
+
 // Remove generated CSS file + directory.
 $up  = wp_upload_dir();
 $dir = trailingslashit( $up['basedir'] ) . 'sw-ds';
