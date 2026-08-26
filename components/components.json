@@ -16,6 +16,7 @@
     { "title": "Hero s mockupem",        "file": "component-hero.html",        "category": "hero" },
     { "title": "Hero se statickým obrázkem",  "file": "component-hero-static.html", "category": "hero" },
     { "title": "Hero s mini galerií",    "file": "component-hero-gallery.html","category": "hero" },
+    { "title": "Hero jen s textem",      "file": "component-hero-text.html",   "category": "hero" },
     { "title": "3 prvky důvěryhodnosti (nekompatibilní s Bootstrap)", "file": "component-trust-3col.html",  "category": "trust" },
     { "title": "4 prvky důvěryhodnosti", "file": "component-trust-mini-4col.html", "category": "trust" },
     { "title": "Obsah a 2 obrázky vlevo",  "file": "component-content-2img-left.html",  "category": "content" },
