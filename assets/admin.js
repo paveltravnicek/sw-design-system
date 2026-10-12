@@ -81,6 +81,10 @@
        one-off migration (CSS Grid wrappers → Bootstrap row/col) and
        there are only three of them.
        ============================================================== */
+    /* `row` is the replacement class list for the wrapper. `cols` is tried
+       in order against each direct child; the first match wins and '*'
+       catches the rest. Both may be functions of the wrapper element, for
+       grids whose column count depends on a modifier class. */
     var GRIDS = {
       'sw-hero-grid': {
         row: 'row g-4 g-lg-5 align-items-center',
@@ -106,6 +110,48 @@
           { match: '*',                   col: 'col-12 col-md-6' }
         ],
         note: 'Rozcestník: mřížka .sw-hub-grid nahrazena Bootstrap row/col.'
+      },
+      'sw-trust-grid': {
+        row: 'row g-3',
+        cols: function (grid) {
+          var four = grid.classList.contains('sw-trust-grid--4');
+          return [{ match: '*', col: 'col-12 col-sm-6 col-lg-' + (four ? '3' : '4') }];
+        },
+        strip: ['sw-trust-grid--3', 'sw-trust-grid--4'],
+        equalHeight: true,
+        note: 'Prvky důvěryhodnosti: mřížka .sw-trust-grid nahrazena Bootstrap row/col.'
+      },
+      'sw-process-grid': {
+        row: 'row g-4',
+        cols: [{ match: '*', col: 'col-12 col-md-6' }],
+        equalHeight: true,
+        note: 'Seznam kroků: mřížka .sw-process-grid nahrazena Bootstrap row/col.'
+      },
+      'sw-pricing-grid': {
+        /* justify-content-center is what replaces the old grid hack that
+           centred a lone third card across both columns. */
+        row: 'row g-4 justify-content-center',
+        cols: function (grid) {
+          var four = grid.classList.contains('sw-pricing-grid--4');
+          var base = 'col-12 col-md-6 col-xl-' + (four ? '3' : '4');
+          return [
+            // featured card goes first when the cards stack on mobile
+            { match: '.sw-price-card--featured', col: base + ' order-first order-md-0' },
+            { match: '*',                        col: base }
+          ];
+        },
+        strip: ['sw-pricing-grid--4'],
+        equalHeight: true,
+        note: 'Ceník: mřížka .sw-pricing-grid nahrazena Bootstrap row/col.'
+      },
+      'sw-faq-layout': {
+        row: 'row g-4 g-lg-5 align-items-start',
+        cols: [
+          { match: '.sw-faq-list',  col: 'col-12 col-lg-8' },
+          { match: '.sw-faq-decor', col: 'col-12 col-lg-4 d-none d-lg-block' },
+          { match: '*',             col: 'col-12' }
+        ],
+        note: 'Časté dotazy: mřížka .sw-faq-layout nahrazena Bootstrap row/col.'
       }
     };
 
@@ -158,28 +204,66 @@
       Object.keys(GRIDS).forEach(function (cls) {
         var rule = GRIDS[cls];
         root.querySelectorAll('.' + cls).forEach(function (grid) {
+          var cols = typeof rule.cols === 'function' ? rule.cols(grid) : rule.cols;
           var kids = Array.prototype.filter.call(grid.children, function (n) {
             return n.nodeType === 1;
           });
 
           kids.forEach(function (kid) {
             var colCls = null;
-            for (var i = 0; i < rule.cols.length; i++) {
-              var m = rule.cols[i];
-              if (m.match === '*' || kid.matches(m.match)) { colCls = m.col; break; }
+            for (var i = 0; i < cols.length; i++) {
+              if (cols[i].match === '*' || kid.matches(cols[i].match)) {
+                colCls = cols[i].col;
+                break;
+              }
             }
             if (!colCls) { return; }
             // Already wrapped by a previous run? Leave it be.
             if (/\bcol(-|$)/.test(kid.className)) { return; }
+
             var col = doc.createElement('div');
             col.className = colCls;
+
+            /* role="listitem" has to sit on the direct child of the
+               role="list", which is now the column — left on the card it
+               would no longer be owned by the list. */
+            if (kid.getAttribute('role') === 'listitem') {
+              kid.removeAttribute('role');
+              col.setAttribute('role', 'listitem');
+            }
+            /* CSS Grid stretched its items to equal height for free;
+               inside a column a card has to ask for it. Only where the
+               library's own markup does — a layout column must not get it. */
+            if (rule.equalHeight && !kid.classList.contains('h-100')) {
+              kid.classList.add('h-100');
+            }
+
+            /* Keep the output readable: reuse the indentation the card
+               already sits at, one level deeper inside the new column. */
+            var pad = (kid.previousSibling && kid.previousSibling.nodeType === 3)
+              ? (kid.previousSibling.nodeValue.match(/[\t ]*$/) || [''])[0]
+              : '';
             grid.insertBefore(col, kid);
+            col.appendChild(doc.createTextNode('\n' + pad + '\t'));
             col.appendChild(kid);
+            col.appendChild(doc.createTextNode('\n' + pad));
           });
 
           grid.classList.remove(cls);
+          (rule.strip || []).forEach(function (c) { grid.classList.remove(c); });
           rule.row.split(' ').forEach(function (c) { grid.classList.add(c); });
           count(rule.note);
+        });
+      });
+
+      /* Anything grid-shaped we don't have a rule for. Saying "nothing to
+         convert" about markup we simply don't recognise would be a lie,
+         and an expensive one — it reads as "this section is fine". */
+      root.querySelectorAll('[class]').forEach(function (el) {
+        el.classList.forEach(function (c) {
+          if (!/^sw-.*-(grid|layout)$/.test(c)) { return; }
+          if (GRIDS[c]) { return; }
+          count('Pozor: našel jsem mřížku .' + c + ', pro kterou nemám pravidlo — nechal jsem ji beze změny. Dej vědět a doplním ji.');
         });
       });
 

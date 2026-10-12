@@ -568,13 +568,6 @@
 /* ================================================================
    COMPONENT: TRUST  (3 or 4 columns of cards with decorative shots)
    ================================================================ */
-.sw-trust-grid {
-  display: grid;
-  gap: 1rem;
-}
-.sw-trust-grid--3 { grid-template-columns: repeat(3, 1fr); }
-.sw-trust-grid--4 { grid-template-columns: repeat(4, 1fr); }
-
 .sw-trust-card {
   position: relative;
   overflow: hidden;
@@ -650,13 +643,7 @@
 /* slightly smaller decor in 4-column variant so it doesn't overpower narrow cards */
 .sw-trust-grid--4 .sw-trust-card-decor { width: 60%; right: -15%; }
 
-@media (max-width: 991.98px) {
-  .sw-trust-grid--3,
-  .sw-trust-grid--4 { grid-template-columns: 1fr 1fr; }
-}
 @media (max-width: 575.98px) {
-  .sw-trust-grid--3,
-  .sw-trust-grid--4 { grid-template-columns: 1fr; }
   .sw-trust-card    { min-height: 0; padding: 1.6rem 1.4rem; }
   .sw-trust-card h2,
   .sw-trust-card p  { max-width: 100%; }
@@ -785,32 +772,6 @@
 .sw-pricing-title { margin: 0 0 .8rem; }
 .sw-pricing-subtitle { margin: 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.6; text-wrap: pretty; }
 
-.sw-pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);   /* md & lg: two side by side */
-  gap: 1.25rem;
-  align-items: stretch;
-}
-/* 2-col mode (md/lg): if a 3rd card wraps alone, center it across both columns */
-@media (min-width: 768px) and (max-width: 1199.98px) {
-  .sw-pricing-grid > .sw-price-card:nth-child(3):last-child {
-    grid-column: 1 / -1;
-    max-width: calc(50% - .625rem);
-    margin-inline: auto;
-  }
-}
-/* xl and up: full three across */
-@media (min-width: 1200px) {
-  .sw-pricing-grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-/* --4 modifier: four plans instead of three. 2-col on md/lg (even pairs),
-   four across from xl up. (The lone-3rd-card centering above only ever
-   matches a grid with exactly 3 children, so it never fires here.) */
-@media (min-width: 1200px) {
-  .sw-pricing-grid--4 { grid-template-columns: repeat(4, 1fr); }
-}
-
 .sw-price-card {
   position: relative;
   display: flex;
@@ -887,8 +848,12 @@
 .sw-price-card:hover { border-color: var(--sw-surface-hover-border, rgba(255,255,255,.28)); }
 
 @media (max-width: 767.98px) {
-  .sw-pricing-grid { grid-template-columns: 1fr; max-width: 480px; margin-inline: auto; }
-  .sw-price-card--featured { transform: none; order: -1; }   /* featured first when stacked */
+  /* Stacked: cap and centre the card itself rather than the wrapper, so
+     this holds for both the Bootstrap row and the legacy grid. Putting
+     the cap on the card is also what lets the featured card come first
+     via order-first on its column. */
+  .sw-price-card { max-width: 480px; margin-inline: auto; }
+  .sw-price-card--featured { transform: none; order: -1; }   /* legacy grid: featured first when stacked */
   .sw-price-card--featured:hover { transform: translateY(-6px); }
 }
 
@@ -901,12 +866,6 @@
 .sw-process-intro { max-width: 70ch; margin: 0 0 clamp(2rem, 4vw, 3rem); }
 .sw-process-title { margin: 0 0 1rem; }
 .sw-process-lead p { margin: 0; color: var(--sw-text-muted); font-size: 1.08rem; line-height: 1.65; text-wrap: pretty; }
-
-.sw-process-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-}
 
 .sw-step {
   position: relative;
@@ -955,10 +914,6 @@
 .sw-step-title { margin: .1rem 0 .5rem; font-size: 1.15rem; font-weight: 750; letter-spacing: -.01em; color: var(--sw-text); text-wrap: balance; }
 .sw-step-body p { margin: 0; color: var(--sw-text-muted); font-size: .98rem; line-height: 1.55; text-wrap: pretty; }
 
-@media (max-width: 767.98px) {
-  .sw-process-grid { grid-template-columns: 1fr; }
-}
-
 
 /* ================================================================
    COMPONENT: FAQ (accordion)
@@ -969,12 +924,6 @@
 .sw-faq-title { margin: 0 0 1rem; }
 .sw-faq-lead p { margin: 0; color: var(--sw-text-muted); font-size: 1.08rem; line-height: 1.65; text-wrap: pretty; }
 
-.sw-faq-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, .55fr);
-  gap: clamp(2rem, 5vw, 4rem);
-  align-items: start;
-}
 .sw-faq-list { display: flex; flex-direction: column; gap: .85rem; }
 
 /* Decorative right column: brand glow + oversized question mark */
@@ -1064,7 +1013,6 @@
 
 /* Below lg: single column, hide the decorative visual */
 @media (max-width: 991.98px) {
-  .sw-faq-layout { grid-template-columns: 1fr; }
   .sw-faq-decor { display: none; }
 }
 
@@ -1843,4 +1791,71 @@ button:hover .sw-bubble-icon {
 }
 @media (max-width: 767.98px) {
   .sw-hub-grid { grid-template-columns: 1fr; }
+}
+
+/* ---- Components migrated in 2.19.1 ---------------------------------
+   These four laid themselves out with CSS Grid until 2.19.1. The rules
+   are unchanged from before the migration, so a page still carrying the
+   old markup renders exactly as it did. New markup never uses them. */
+
+/* 3 (or 4) PRVKY DŮVĚRYHODNOSTI — .sw-trust-grid */
+.sw-trust-grid {
+  display: grid;
+  gap: 1rem;
+}
+.sw-trust-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.sw-trust-grid--4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 991.98px) {
+  .sw-trust-grid--3,
+  .sw-trust-grid--4 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 575.98px) {
+  .sw-trust-grid--3,
+  .sw-trust-grid--4 { grid-template-columns: 1fr; }
+}
+
+/* CENÍK — .sw-pricing-grid */
+.sw-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);   /* md & lg: two side by side */
+  gap: 1.25rem;
+  align-items: stretch;
+}
+/* 2-col mode (md/lg): a 3rd card wrapping alone is centred across both
+   columns. The Bootstrap markup gets this from .justify-content-center
+   on the row instead. */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .sw-pricing-grid > .sw-price-card:nth-child(3):last-child {
+    grid-column: 1 / -1;
+    max-width: calc(50% - .625rem);
+    margin-inline: auto;
+  }
+}
+@media (min-width: 1200px) {
+  .sw-pricing-grid    { grid-template-columns: repeat(3, 1fr); }
+  .sw-pricing-grid--4 { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 767.98px) {
+  .sw-pricing-grid { grid-template-columns: 1fr; }
+}
+
+/* SEZNAM KROKŮ — .sw-process-grid */
+.sw-process-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+@media (max-width: 767.98px) {
+  .sw-process-grid { grid-template-columns: 1fr; }
+}
+
+/* ČASTÉ DOTAZY — .sw-faq-layout */
+.sw-faq-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .55fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+@media (max-width: 991.98px) {
+  .sw-faq-layout { grid-template-columns: 1fr; }
 }
