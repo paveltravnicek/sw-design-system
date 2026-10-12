@@ -215,9 +215,21 @@
 .swds-usage-head {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin: 0 0 8px;
   font-size: 15px;
+}
+.swds-usage-head > a:first-child { text-decoration: none; }
+.swds-usage-view { margin-left: auto; font-size: 12px; font-weight: 400; text-decoration: none; }
+.swds-usage-filter { margin: 0 0 16px; }
+.swds-usage-filter label { font-size: 13px; cursor: pointer; }
+.swds-usage-group.is-clean .swds-usage-head > a:first-child { font-weight: 600; opacity: .72; }
+.swds-usage-only-bad .swds-usage-group.is-clean { display: none; }
+.swds-usage-pos {
+  width: 26px;
+  color: #a7aaad;
+  font-variant-numeric: tabular-nums;
 }
 .swds-usage-count {
   font-weight: 400;
@@ -263,7 +275,7 @@
   color: #7a3e00;
   border-radius: 4px;
 }
-.swds-usage-act { width: 210px; text-align: right; white-space: nowrap; }
+.swds-usage-act { width: 150px; text-align: right; white-space: nowrap; }
 .swds-usage-act .button { margin-left: 5px; }
 @media (max-width: 782px) {
   .swds-usage-table, .swds-usage-table tbody, .swds-usage-table tr, .swds-usage-table td { display: block; width: auto; }

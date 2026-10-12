@@ -381,6 +381,11 @@
       $rep.attr('hidden', true).empty();
     });
 
+    /* Usage screen: hide pages that are already current. */
+    $(document).on('change', '#swds-usage-only-bad', function () {
+      $('[data-panel="usage"]').toggleClass('swds-usage-only-bad', this.checked);
+    });
+
     /* ==============================================================
        Usage screen → converter
 

@@ -239,16 +239,48 @@ $tabs['convert'] = array( 'title' => 'Převod HTML', 'icon' => 'update' );
             page — converting stays manual, one section at a time, because
             a pasted copy may have been edited by hand and no rule can
             tell a deliberate change from drift. */
-        $scan  = SWDS_Usage::scan();
-        $byc   = array();
+        $scan    = SWDS_Usage::scan();
         $flagged = 0;
+
+        /* Grouped by page, not by component: fixing a site means working
+           through it page by page — open one in LiveCanvas, sort out every
+           section on it, move on — not chasing one component across eight
+           pages and opening each of them again for the next component. */
+        $pages = array();
         foreach ( $scan['rows'] as $r ) {
-            $key = $r['title'];
-            if ( ! isset( $byc[ $key ] ) ) { $byc[ $key ] = array(); }
-            $byc[ $key ][] = $r;
-            if ( $r['issues'] ) { $flagged++; }
+            $pid = $r['post_id'];
+            if ( ! isset( $pages[ $pid ] ) ) {
+                $pages[ $pid ] = array(
+                    'title'  => $r['post_title'],
+                    'type'   => $r['post_type'],
+                    'status' => $r['status'],
+                    'rows'   => array(),
+                    'bad'    => 0,
+                );
+            }
+            $pages[ $pid ]['rows'][] = $r;
+            if ( $r['issues'] ) { $pages[ $pid ]['bad']++; $flagged++; }
         }
-        ksort( $byc );
+
+        // Sections in the order they appear on the page — that is the order
+        // you meet them scrolling down it in the builder.
+        foreach ( $pages as &$pg ) {
+            usort( $pg['rows'], function ( $a, $b ) { return $a['index'] - $b['index']; } );
+        }
+        unset( $pg );
+
+        /* Pages needing attention first, everything already current at the
+           bottom. The front page is hoisted to the top only when it is one
+           of the pages needing work — a clean home page sitting above the
+           list would just push the actual work down. */
+        $front = (int) get_option( 'page_on_front' );
+        uasort( $pages, function ( $a, $b ) {
+            if ( ( $a['bad'] > 0 ) !== ( $b['bad'] > 0 ) ) { return $a['bad'] > 0 ? -1 : 1; }
+            return strcasecmp( $a['title'], $b['title'] );
+        } );
+        if ( $front && isset( $pages[ $front ] ) && $pages[ $front ]['bad'] ) {
+            $pages = array( $front => $pages[ $front ] ) + $pages;
+        }
         ?>
         <div class="swds-panel" data-panel="usage">
             <p class="swds-intro">Kde na webu které komponenty leží a jestli jsou v současné podobě. Tahle obrazovka <strong>jen čte</strong> — žádnou stránku nemění. U nálezu, který je něčím označený, si můžete jeho HTML poslat rovnou do převodníku, podívat se, co by se změnilo, a vložit ho zpátky sám.</p>
@@ -273,25 +305,42 @@ $tabs['convert'] = array( 'title' => 'Převod HTML', 'icon' => 'update' );
             <?php if ( ! $scan['rows'] ) : ?>
                 <p class="swds-help">Na webu zatím není žádná sekce z tohohle design systému — nebo stránky používají jiné uložiště obsahu než <code>post_content</code>.</p>
             <?php else : ?>
-                <?php foreach ( $byc as $label => $rows ) :
-                    $bad = 0;
-                    foreach ( $rows as $r ) { if ( $r['issues'] ) { $bad++; } } ?>
-                    <div class="swds-usage-group">
+                <p class="swds-usage-filter">
+                    <label>
+                        <input type="checkbox" id="swds-usage-only-bad">
+                        Zobrazit jen stránky, které něco potřebují
+                    </label>
+                </p>
+
+                <?php foreach ( $pages as $pid => $pg ) : ?>
+                    <div class="swds-usage-group<?php echo $pg['bad'] ? '' : ' is-clean'; ?>">
                         <h3 class="swds-usage-head">
-                            <?php echo esc_html( $label ); ?>
-                            <span class="swds-usage-count"><?php echo count( $rows ); ?>×</span>
-                            <?php if ( $bad ) : ?>
-                                <span class="swds-usage-bad"><?php echo (int) $bad; ?> k pozornosti</span>
+                            <a href="<?php echo esc_url( get_edit_post_link( $pid ) ); ?>"><?php echo esc_html( $pg['title'] ); ?></a>
+                            <?php if ( $front === $pid ) : ?>
+                                <span class="swds-usage-count">úvodní stránka</span>
                             <?php endif; ?>
+                            <span class="swds-usage-count">
+                                <?php echo count( $pg['rows'] ); ?> <?php
+                                    echo 1 === count( $pg['rows'] ) ? 'sekce' : ( count( $pg['rows'] ) < 5 ? 'sekce' : 'sekcí' ); ?>
+                                <?php echo 'publish' === $pg['status'] ? '' : '· ' . esc_html( $pg['status'] ); ?>
+                            </span>
+                            <?php if ( $pg['bad'] ) : ?>
+                                <span class="swds-usage-bad"><?php echo (int) $pg['bad']; ?> k pozornosti</span>
+                            <?php else : ?>
+                                <span class="swds-usage-ok">vše aktuální</span>
+                            <?php endif; ?>
+                            <a class="swds-usage-view" href="<?php echo esc_url( get_permalink( $pid ) ); ?>" target="_blank" rel="noopener">zobrazit ↗</a>
                         </h3>
                         <table class="swds-usage-table">
                             <tbody>
-                            <?php foreach ( $rows as $r ) : ?>
+                            <?php foreach ( $pg['rows'] as $n => $r ) : ?>
                                 <tr class="<?php echo $r['issues'] ? 'is-flagged' : ''; ?>">
+                                    <td class="swds-usage-pos"><?php echo (int) ( $n + 1 ); ?>.</td>
                                     <td class="swds-usage-page">
-                                        <a href="<?php echo esc_url( get_edit_post_link( $r['post_id'] ) ); ?>"><?php echo esc_html( $r['post_title'] ); ?></a>
-                                        <span class="swds-usage-meta"><?php echo esc_html( $r['post_type'] ); ?><?php
-                                            echo 'publish' === $r['status'] ? '' : ' · ' . esc_html( $r['status'] ); ?></span>
+                                        <strong><?php echo esc_html( $r['title'] ); ?></strong>
+                                        <?php if ( ! $r['exact'] ) : ?>
+                                            <span class="swds-usage-meta">rozpoznáno z kódu, bez razítka</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="swds-usage-ver">
                                         <?php echo $r['exact'] ? '@' . (int) $r['version'] : '—'; ?>
@@ -305,9 +354,8 @@ $tabs['convert'] = array( 'title' => 'Převod HTML', 'icon' => 'update' );
                                     </td>
                                     <td class="swds-usage-act">
                                         <button type="button" class="button button-small swds-usage-load"
-                                                data-post="<?php echo (int) $r['post_id']; ?>"
+                                                data-post="<?php echo (int) $pid; ?>"
                                                 data-index="<?php echo (int) $r['index']; ?>">Do převodníku</button>
-                                        <a class="button button-small" href="<?php echo esc_url( get_permalink( $r['post_id'] ) ); ?>" target="_blank" rel="noopener">Zobrazit</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
