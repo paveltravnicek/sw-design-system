@@ -3,7 +3,7 @@
  * Plugin Name:       SW Design System
  * Plugin URI:        https://smart-websites.cz/
  * Description:       Konfigurovatelný design systém pro weby Smart Websites. Nastavte barvy, dark mode, tvarosloví, stíny a animace v jednom místě — plugin z toho vygeneruje CSS. Obsahuje knihovnu komponent a nápovědu.
- * Version:            2.19.1
+ * Version:            2.20.0
  * Author:            Smart Websites
  * Author URI:        https://smart-websites.cz/
  * License:           GPL-2.0-or-later
@@ -34,7 +34,7 @@ if ( file_exists( __DIR__ . '/plugin-update-checker/plugin-update-checker.php' )
     }
 }
 
-define( 'SWDS_VERSION', '2.19.1' );
+define( 'SWDS_VERSION', '2.20.0' );
 define( 'SWDS_FILE', __FILE__ );
 define( 'SWDS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SWDS_URL', plugin_dir_url( __FILE__ ) );
@@ -65,6 +65,7 @@ spl_autoload_register( function ( $class ) {
         'SWDS_Library'   => 'class-swds-library.php',
         'SWDS_Settings'  => 'class-swds-settings.php',
         'SWDS_Frontend'  => 'class-swds-frontend.php',
+        'SWDS_Usage'     => 'class-swds-usage.php',
     );
     if ( isset( $map[ $class ] ) ) {
         require_once SWDS_DIR . 'includes/' . $map[ $class ];
@@ -102,6 +103,7 @@ function swds_maybe_regenerate() {
     // The converter's lc-block/editable map is derived from the bundled
     // component files, so a new version can mean new slots to learn.
     delete_transient( 'swds_lc_hints' );
+    delete_transient( 'swds_usage_scan' );   // component versions may have moved
     update_option( 'swds_version', SWDS_VERSION );
 }
 

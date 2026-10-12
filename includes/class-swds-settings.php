@@ -17,6 +17,40 @@ class SWDS_Settings {
         add_action( 'admin_menu', array( $this, 'menu' ) );
         add_action( 'admin_init', array( $this, 'handle_post' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'assets' ) );
+        add_action( 'wp_ajax_swds_section', array( $this, 'ajax_section' ) );
+    }
+
+    /**
+     * Hand one component occurrence's markup to the converter.
+     *
+     * The usage screen lists where each component sits; this fetches the
+     * actual bytes of one of those sections on demand, so the admin page
+     * stays small no matter how many pages the site has. Read-only — it
+     * returns markup and changes nothing.
+     */
+    public function ajax_section() {
+        if ( ! current_user_can( self::CAP ) ) {
+            wp_send_json_error( 'nedostatečná oprávnění', 403 );
+        }
+        check_ajax_referer( 'swds_section', 'nonce' );
+
+        $post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        $index   = isset( $_GET['index'] ) ? absint( $_GET['index'] ) : 0;
+
+        $post = $post_id ? get_post( $post_id ) : null;
+        if ( ! $post ) {
+            wp_send_json_error( 'stránka nenalezena', 404 );
+        }
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( 'nedostatečná oprávnění ke stránce', 403 );
+        }
+
+        $sections = SWDS_Usage::sections( $post->post_content );
+        if ( ! isset( $sections[ $index ] ) ) {
+            wp_send_json_error( 'sekce už na stránce není — projděte web znovu', 404 );
+        }
+
+        wp_send_json_success( array( 'html' => $sections[ $index ]['html'] ) );
     }
 
     public function menu() {
@@ -37,6 +71,10 @@ class SWDS_Settings {
         wp_enqueue_script( 'wp-color-picker' );
         wp_enqueue_style( 'swds-admin', SWDS_URL . 'assets/admin.css', array(), SWDS_VERSION );
         wp_enqueue_script( 'swds-admin', SWDS_URL . 'assets/admin.js', array( 'jquery', 'wp-color-picker' ), SWDS_VERSION, true );
+        wp_localize_script( 'swds-admin', 'SWDS_ADMIN', array(
+            'ajax'  => admin_url( 'admin-ajax.php' ),
+            'nonce' => wp_create_nonce( 'swds_section' ),
+        ) );
     }
 
     /**
@@ -76,8 +114,18 @@ class SWDS_Settings {
                 }
                 break;
 
+            case 'rescan_usage':
+                SWDS_Usage::flush();
+                SWDS_Usage::scan( true );
+                wp_safe_redirect( add_query_arg(
+                    array( 'page' => self::SLUG, 'swds_notice' => 'usage' ),
+                    admin_url( 'themes.php' )
+                ) );
+                exit;
+
             case 'refresh_library':
                 delete_transient( 'swds_lc_hints' ); // converter rules come from the same files
+                SWDS_Usage::flush();                 // component versions may have moved
                 $list = SWDS_Library::components( true ); // force refresh
                 $ok   = false;
                 foreach ( (array) $list as $c ) {

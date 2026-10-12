@@ -209,3 +209,64 @@
 .swds-conv-report li { margin: 3px 0; }
 .swds-conv-ok { margin: 0 0 4px; }
 .swds-conv-warn { margin: 0; color: #646970; font-size: 12px; }
+
+/* ---------- Usage screen ---------- */
+.swds-usage-group { margin: 0 0 26px; }
+.swds-usage-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.swds-usage-count {
+  font-weight: 400;
+  font-size: 12px;
+  color: #646970;
+}
+.swds-usage-bad {
+  font-weight: 600;
+  font-size: 11px;
+  color: #8a2d00;
+  background: #fcf0e6;
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+.swds-usage-table {
+  width: 100%;
+  max-width: 1100px;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.swds-usage-table td {
+  padding: 9px 12px;
+  border-top: 1px solid #f0f0f1;
+  vertical-align: top;
+  font-size: 13px;
+}
+.swds-usage-table tr:first-child td { border-top: 0; }
+.swds-usage-table tr.is-flagged { background: #fffaf5; }
+.swds-usage-page a { font-weight: 600; text-decoration: none; }
+.swds-usage-meta { display: block; font-size: 11px; color: #8c8f94; }
+.swds-usage-ver { width: 56px; color: #646970; font-family: Menlo, Consolas, monospace; }
+.swds-usage-issues { width: 46%; }
+.swds-usage-ok { color: #3a7d44; font-size: 12px; }
+.swds-usage-flag {
+  display: inline-block;
+  margin: 0 5px 3px 0;
+  padding: 2px 8px;
+  font-size: 11px;
+  background: #f6e7d8;
+  color: #7a3e00;
+  border-radius: 4px;
+}
+.swds-usage-act { width: 210px; text-align: right; white-space: nowrap; }
+.swds-usage-act .button { margin-left: 5px; }
+@media (max-width: 782px) {
+  .swds-usage-table, .swds-usage-table tbody, .swds-usage-table tr, .swds-usage-table td { display: block; width: auto; }
+  .swds-usage-act { text-align: left; margin-top: 4px; }
+  .swds-usage-act .button { margin: 0 5px 0 0; }
+}

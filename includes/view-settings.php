@@ -11,6 +11,7 @@ $notice_map = array(
     'reset'        => array( 'ok',  'Nastavení vráceno na výchozí hodnoty.' ),
     'imported'     => array( 'ok',  'Nastavení naimportováno.' ),
     'library'      => array( 'ok',  'Seznam sekcí byl aktualizován.' ),
+    'usage'        => array( 'ok',  'Web byl projit znovu.' ),
     'library_local' => array( 'err', 'Nejnovější sekce se teď nepodařilo načíst. Zobrazují se vestavěné sekce — zkuste to prosím za chvíli znovu.' ),
     'import_error' => array( 'err', 'Import se nezdařil — vložený text není platný JSON.' ),
 );
@@ -24,6 +25,7 @@ foreach ( $schema as $gkey => $group ) {
 $tabs['presets'] = array( 'title' => 'Presety',  'icon' => 'images-alt2' );
 $tabs['help']    = array( 'title' => 'Nápověda', 'icon' => 'editor-help' );
 $tabs['library'] = array( 'title' => 'Komponenty', 'icon' => 'block-default' );
+$tabs['usage']   = array( 'title' => 'Použití', 'icon' => 'search' );
 $tabs['convert'] = array( 'title' => 'Převod HTML', 'icon' => 'update' );
 ?>
 <div class="wrap swds-app" id="swds-wrap">
@@ -231,6 +233,91 @@ $tabs['convert'] = array( 'title' => 'Převod HTML', 'icon' => 'update' );
             <?php endforeach; ?>
         </div>
 
+        <?php /* ---------- Usage ----------
+            Where each component actually sits on the site. Read-only: it
+            runs one query and parses what it finds. Nothing here edits a
+            page — converting stays manual, one section at a time, because
+            a pasted copy may have been edited by hand and no rule can
+            tell a deliberate change from drift. */
+        $scan  = SWDS_Usage::scan();
+        $byc   = array();
+        $flagged = 0;
+        foreach ( $scan['rows'] as $r ) {
+            $key = $r['title'];
+            if ( ! isset( $byc[ $key ] ) ) { $byc[ $key ] = array(); }
+            $byc[ $key ][] = $r;
+            if ( $r['issues'] ) { $flagged++; }
+        }
+        ksort( $byc );
+        ?>
+        <div class="swds-panel" data-panel="usage">
+            <p class="swds-intro">Kde na webu které komponenty leží a jestli jsou v současné podobě. Tahle obrazovka <strong>jen čte</strong> — žádnou stránku nemění. U nálezu, který je něčím označený, si můžete jeho HTML poslat rovnou do převodníku, podívat se, co by se změnilo, a vložit ho zpátky sám.</p>
+
+            <p style="margin:-8px 0 18px;">
+                <button type="submit" name="swds_action" value="rescan_usage" class="button">↻ Projít web znovu</button>
+                <span class="swds-help" style="margin-left:10px;">
+                    Prohledáno stránek: <?php echo (int) $scan['scanned']; ?> ·
+                    nalezeno sekcí: <?php echo count( $scan['rows'] ); ?> ·
+                    k pozornosti: <strong><?php echo (int) $flagged; ?></strong> ·
+                    naposledy <?php echo esc_html( date_i18n( 'j. n. H:i', $scan['time'] ) ); ?>
+                </span>
+            </p>
+
+            <?php if ( $scan['capped'] ) : ?>
+                <div class="swds-notice swds-notice-err">
+                    <span class="dashicons dashicons-warning"></span>
+                    <span>Výpis je omezený na <?php echo (int) SWDS_Usage::MAX_POSTS; ?> stránek, web je větší. Zobrazené nálezy platí, ale nejsou úplné.</span>
+                </div>
+            <?php endif; ?>
+
+            <?php if ( ! $scan['rows'] ) : ?>
+                <p class="swds-help">Na webu zatím není žádná sekce z tohohle design systému — nebo stránky používají jiné uložiště obsahu než <code>post_content</code>.</p>
+            <?php else : ?>
+                <?php foreach ( $byc as $label => $rows ) :
+                    $bad = 0;
+                    foreach ( $rows as $r ) { if ( $r['issues'] ) { $bad++; } } ?>
+                    <div class="swds-usage-group">
+                        <h3 class="swds-usage-head">
+                            <?php echo esc_html( $label ); ?>
+                            <span class="swds-usage-count"><?php echo count( $rows ); ?>×</span>
+                            <?php if ( $bad ) : ?>
+                                <span class="swds-usage-bad"><?php echo (int) $bad; ?> k pozornosti</span>
+                            <?php endif; ?>
+                        </h3>
+                        <table class="swds-usage-table">
+                            <tbody>
+                            <?php foreach ( $rows as $r ) : ?>
+                                <tr class="<?php echo $r['issues'] ? 'is-flagged' : ''; ?>">
+                                    <td class="swds-usage-page">
+                                        <a href="<?php echo esc_url( get_edit_post_link( $r['post_id'] ) ); ?>"><?php echo esc_html( $r['post_title'] ); ?></a>
+                                        <span class="swds-usage-meta"><?php echo esc_html( $r['post_type'] ); ?><?php
+                                            echo 'publish' === $r['status'] ? '' : ' · ' . esc_html( $r['status'] ); ?></span>
+                                    </td>
+                                    <td class="swds-usage-ver">
+                                        <?php echo $r['exact'] ? '@' . (int) $r['version'] : '—'; ?>
+                                    </td>
+                                    <td class="swds-usage-issues">
+                                        <?php if ( ! $r['issues'] ) : ?>
+                                            <span class="swds-usage-ok">aktuální</span>
+                                        <?php else : foreach ( $r['issues'] as $i ) : ?>
+                                            <span class="swds-usage-flag"><?php echo esc_html( $i ); ?></span>
+                                        <?php endforeach; endif; ?>
+                                    </td>
+                                    <td class="swds-usage-act">
+                                        <button type="button" class="button button-small swds-usage-load"
+                                                data-post="<?php echo (int) $r['post_id']; ?>"
+                                                data-index="<?php echo (int) $r['index']; ?>">Do převodníku</button>
+                                        <a class="button button-small" href="<?php echo esc_url( get_permalink( $r['post_id'] ) ); ?>" target="_blank" rel="noopener">Zobrazit</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
         <?php /* ---------- Converter ----------
             Takes a section that was pasted into a page before the
             Bootstrap migration and brings it up to the current shape.
@@ -242,6 +329,10 @@ $tabs['convert'] = array( 'title' => 'Převod HTML', 'icon' => 'update' );
             so the converter keeps matching the library as it changes
             instead of drifting away from it. */
         $hints = SWDS_Library::lc_hints();
+        // The component catalogue lets the converter stamp what it
+        // recognises. Families shared by several components (the four
+        // heroes) stay unstamped on purpose — see the note in admin.js.
+        $hints['components'] = SWDS_Usage::catalogue();
         ?>
         <div class="swds-panel" data-panel="convert">
             <p class="swds-intro">Máte na stránce sekci vloženou ze starší verze knihovny? Vložte její HTML sem. Nástroj ho převede na současnou podobu — Bootstrap <code>row</code>/<code>col</code> místo starých mřížek, doplní <code>lc-block</code> a <code>editable</code> pro LiveCanvas a vyčistí zbytky, které do kódu zapsal starší runtime. <strong>Nic se nikam neukládá</strong>, výsledek si odnesete tlačítkem Kopírovat.</p>

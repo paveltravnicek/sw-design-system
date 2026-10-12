@@ -14,6 +14,7 @@ delete_option( 'swds_version' );
 delete_transient( 'swds_library_cache' );
 delete_transient( 'swds_library_cache_cats' );
 delete_transient( 'swds_lc_hints' );
+delete_transient( 'swds_usage_scan' );
 
 // Remove generated CSS file + directory.
 $up  = wp_upload_dir();

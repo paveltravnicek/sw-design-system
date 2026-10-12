@@ -12,7 +12,7 @@
     var $panels  = $('.swds-panel');
     var $actions = $('.swds-actions');
     // Panels where the Save/Reset bar makes no sense
-    var noSaveBar = ['presets', 'help', 'library', 'convert'];
+    var noSaveBar = ['presets', 'help', 'library', 'convert', 'usage'];
 
     function activate(tabKey) {
       $tabs.removeClass('swds-tab-active');
@@ -286,7 +286,59 @@
         });
       });
 
-      /* --- 5. tidy up ------------------------------------------ */
+      /* --- 5. version stamp ------------------------------------
+         data-sw-c tells the usage screen exactly what a section is and
+         which revision of the markup it carries — without it, all it can
+         do is name the family. Stamped only where the family identifies
+         one component: .sw-hero is shared by four, and a wrong stamp is
+         worse than none, because the usage screen would then trust it. */
+      var cat = hints.components || {};
+      root.querySelectorAll('section[class]').forEach(function (sec) {
+        if (sec.hasAttribute('data-sw-c')) {
+          // Already stamped: bring the revision up to date, since this
+          // conversion is what makes the markup current.
+          var cur = (sec.getAttribute('data-sw-c').split('@')[0] || '').trim();
+          if (cat[cur] && sec.getAttribute('data-sw-c') !== cur + '@' + cat[cur].version) {
+            sec.setAttribute('data-sw-c', cur + '@' + cat[cur].version);
+            count('Razítko .' + cur + ' zvednuto na @' + cat[cur].version + '.');
+          }
+          return;
+        }
+
+        var classes = sec.className.split(/\s+/);
+        var hits = Object.keys(cat).filter(function (id) {
+          return cat[id].section && classes.indexOf(cat[id].section) !== -1;
+        });
+
+        /* Same narrowing the usage screen does: the distinguishing class
+           first, then the number of blocks. Both values are computed from
+           the component files server-side (SWDS_Usage::catalogue), so
+           only the two lines of matching live here. */
+        if (hits.length > 1) {
+          var byMark = hits.filter(function (id) {
+            return cat[id].mark && sec.querySelector('.' + cat[id].mark);
+          });
+          if (byMark.length === 1) {
+            hits = byMark;
+          } else {
+            if (byMark.length) { hits = byMark; }
+            var blocks = sec.querySelectorAll('.lc-block').length;
+            var byCard = hits.filter(function (id) { return Number(cat[id].cards) === blocks; });
+            if (byCard.length === 1) { hits = byCard; }
+          }
+        }
+
+        if (hits.length === 1) {
+          sec.setAttribute('data-sw-c', hits[0] + '@' + cat[hits[0]].version);
+          count('Doplněno razítko data-sw-c="' + hits[0] + '@' + cat[hits[0]].version + '" (podle něj pak obrazovka Použití pozná, co na stránce leží).');
+        } else if (hits.length > 1) {
+          count('Razítko jsem nedoplnil — tahle sekce může být ' + hits.join(' nebo ') +
+                ' a z kódu se to nepozná. Dopiš prosím ručně data-sw-c="<ta správná>@' +
+                cat[hits[0]].version + '" na <section>.');
+        }
+      });
+
+      /* --- 6. tidy up ------------------------------------------ */
       root.querySelectorAll('[class=""]').forEach(function (el) {
         el.removeAttribute('class');
       });
@@ -327,6 +379,48 @@
       $in.val('');
       $out.val('');
       $rep.attr('hidden', true).empty();
+    });
+
+    /* ==============================================================
+       Usage screen → converter
+
+       Fetches one component occurrence's markup and drops it into the
+       converter, already converted, so the comparison is in front of
+       you in one click. Still nothing is written anywhere: the result
+       goes back to the page only if you copy it there yourself.
+       ============================================================== */
+    $(document).on('click', '.swds-usage-load', function () {
+      var btn = this;
+      var $btn = $(btn);
+      if ($btn.prop('disabled')) { return; }
+
+      var orig = btn.textContent;
+      $btn.prop('disabled', true);
+      btn.textContent = 'Načítám…';
+
+      $.getJSON(SWDS_ADMIN.ajax, {
+        action: 'swds_section',
+        nonce:  SWDS_ADMIN.nonce,
+        post:   $btn.data('post'),
+        index:  $btn.data('index')
+      }).done(function (res) {
+        if (!res || !res.success) {
+          btn.textContent = 'Nepovedlo se';
+          return;
+        }
+        $in.val(res.data.html);
+        activate('convert');
+        $('#swds-conv-run').trigger('click');
+        $('html, body').animate({ scrollTop: $('#swds-conv-in').offset().top - 60 }, 200);
+      }).fail(function (xhr) {
+        var msg = (xhr && xhr.responseJSON && xhr.responseJSON.data) || 'Nepovedlo se';
+        btn.textContent = String(msg).slice(0, 40);
+      }).always(function () {
+        setTimeout(function () {
+          btn.textContent = orig;
+          $btn.prop('disabled', false);
+        }, 1800);
+      });
     });
   });
 })(jQuery);
