@@ -9,9 +9,11 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 delete_option( 'swds_settings' );
 delete_option( 'swds_version' );
 
-// Remove cached component library (both the manifest and the category map).
+// Remove cached component library (manifest, category map) and the
+// lc-block/editable map the converter reads.
 delete_transient( 'swds_library_cache' );
 delete_transient( 'swds_library_cache_cats' );
+delete_transient( 'swds_lc_hints' );
 
 // Remove generated CSS file + directory.
 $up  = wp_upload_dir();

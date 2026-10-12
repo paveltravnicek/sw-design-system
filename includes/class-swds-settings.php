@@ -77,6 +77,7 @@ class SWDS_Settings {
                 break;
 
             case 'refresh_library':
+                delete_transient( 'swds_lc_hints' ); // converter rules come from the same files
                 $list = SWDS_Library::components( true ); // force refresh
                 $ok   = false;
                 foreach ( (array) $list as $c ) {

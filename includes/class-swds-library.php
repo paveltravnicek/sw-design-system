@@ -30,6 +30,9 @@ class SWDS_Library {
     const TRANSIENT = 'swds_library_cache';
     const TTL       = 6 * HOUR_IN_SECONDS;
 
+    /** Cache for the lc-block / editable map derived from the bundled components. */
+    const HINTS_TRANSIENT = 'swds_lc_hints';
+
     // Repo coordinates — adjust if repo/branch changes.
     const REPO   = 'paveltravnicek/sw-design-system';
     const BRANCH = 'main';
@@ -277,6 +280,75 @@ class SWDS_Library {
                 );
             }
         }
+        return $out;
+    }
+
+    /**
+     * Which classes carry lc-block, and which carry editable="inline|rich".
+     *
+     * Read out of the bundled component files rather than written down by
+     * hand, so the converter in the admin keeps matching the components as
+     * they change. A hand-kept list would silently rot the first time a
+     * component gained a new editable slot.
+     *
+     * A class only counts as a rule when it appears on the same kind of
+     * element across the library — .sw-reveal-item sits on almost every
+     * card, so it says nothing about that card being a block, and a bare
+     * tag name (p, span, h2) is far too broad to act on.
+     *
+     * Returns array( 'block' => array<string>, 'editable' => array<class,mode> ).
+     */
+    public static function lc_hints() {
+        $cached = get_transient( self::HINTS_TRANSIENT );
+        if ( is_array( $cached ) ) {
+            return $cached;
+        }
+
+        $skip  = array( 'sw-reveal-item', 'sw-anim-on', 'sw-rv' );
+        $block = array();
+        $edit  = array();
+
+        foreach ( glob( SWDS_DIR . 'components/*.html' ) as $file ) {
+            $html = file_get_contents( $file );
+            if ( ! $html ) { continue; }
+
+            if ( ! preg_match_all( '#<([a-z0-9]+)\b([^>]*)>#i', $html, $tags, PREG_SET_ORDER ) ) {
+                continue;
+            }
+
+            foreach ( $tags as $tag ) {
+                $attrs = $tag[2];
+
+                if ( ! preg_match( '#class="([^"]*)"#', $attrs, $cm ) ) { continue; }
+                $classes = preg_split( '#\s+#', trim( $cm[1] ), -1, PREG_SPLIT_NO_EMPTY );
+
+                $sw = array();
+                foreach ( $classes as $c ) {
+                    if ( 0 === strpos( $c, 'sw-' ) && ! in_array( $c, $skip, true ) ) {
+                        $sw[] = $c;
+                    }
+                }
+                if ( ! $sw ) { continue; }
+
+                if ( in_array( 'lc-block', $classes, true ) ) {
+                    // The first sw- class is the component's own name for
+                    // this element; the rest are modifiers of it.
+                    $block[ $sw[0] ] = isset( $block[ $sw[0] ] ) ? $block[ $sw[0] ] + 1 : 1;
+                }
+
+                if ( preg_match( '#editable="(inline|rich)"#', $attrs, $em ) ) {
+                    $edit[ $sw[0] ] = $em[1];
+                }
+            }
+        }
+
+        arsort( $block );
+        $out = array(
+            'block'    => array_keys( $block ),
+            'editable' => $edit,
+        );
+
+        set_transient( self::HINTS_TRANSIENT, $out, self::TTL );
         return $out;
     }
 }

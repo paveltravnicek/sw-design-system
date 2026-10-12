@@ -303,10 +303,12 @@
 /* ================================================================
    5. ENTRANCE ANIMATIONS
       - .sw-fade-in*  : auto-fade on load (for hero copy etc.)
-      - [data-sw-reveal] : JS adds .sw-anim-on, then .is-visible on
-        intersect. Children with .sw-reveal-item animate in.
-      Content is VISIBLE by default — JS only adds the animation.
-      That way LiveCanvas editor (or any JS-less context) shows OK.
+      - [data-sw-reveal] : the runtime watches each .sw-reveal-item
+        child and fades it up when it scrolls into view.
+      Invariant: an element is only ever hidden while JS is actively
+      responsible for showing it again. Nothing is hidden by markup
+      alone, so a JS-less context — or a page builder that re-renders
+      a block — always shows the content.
    ================================================================ */
 @keyframes swFadeUp {
   from { opacity: 0; transform: translateY(22px); filter: blur(8px); }
@@ -327,16 +329,49 @@
 .sw-fade-in-2 { animation: swFadeUp .8s .24s ease both; }
 .sw-fade-in-3 { animation: swFadeUp .8s .32s ease both; }
 
-.sw-anim-on .sw-reveal-item {
+/* The hidden state is keyed on TWO flags, and this pairing is the whole
+   point — each flag is only ever set by code that also guarantees its
+   removal, so an item can never end up hidden with nobody left to
+   reveal it:
+
+     1. html.sw-ds-reveal — set by the tiny head script before first
+        paint (SWDS_Frontend::reveal_flag), and dropped again by the
+        runtime the instant it has claimed the items it found. It only
+        has to cover the gap between first paint and runtime init.
+        It also drops itself on a timer if the runtime never arrives.
+
+     2. .sw-reveal-item.sw-rv — the runtime stamps this on each item it
+        is actually observing, and takes it off when the item reveals.
+
+   An item that nobody is observing is therefore VISIBLE. That matters
+   inside a page builder: when LiveCanvas re-renders a block from its
+   source after an edit, the fresh nodes carry neither flag, so they
+   simply show. Before, they carried .sw-reveal-item while
+   html.sw-ds-reveal was still up and no observer knew about them —
+   which left them at opacity 0 permanently, i.e. the component
+   vanished the moment you edited it.
+
+   Do not reintroduce a hiding rule that a dynamically inserted node
+   can match on its own. Hiding must always be opt-in by JS. */
+.sw-ds-reveal [data-sw-reveal] .sw-reveal-item,
+[data-sw-reveal] .sw-reveal-item.sw-rv {
   opacity: 0;
   transform: translateY(var(--sw-reveal-distance));
+}
+/* The transition sits on the item unconditionally, so that *removing*
+   either flag animates rather than snapping. */
+[data-sw-reveal] .sw-reveal-item {
   transition: opacity var(--sw-reveal-duration) ease, transform var(--sw-reveal-duration) ease;
 }
-.sw-anim-on .sw-reveal-item.is-in { opacity: 1; transform: translateY(0); }
-/* subtle stagger when several items reveal together (same row) */
-.sw-anim-on .sw-reveal-item:nth-child(2).is-in { transition-delay: .08s; }
-.sw-anim-on .sw-reveal-item:nth-child(3).is-in { transition-delay: .16s; }
-.sw-anim-on .sw-reveal-item:nth-child(4).is-in { transition-delay: .24s; }
+/* Shows an item while flag 1 is still up (first paint → init). Needs to
+   outrank the hiding rule above, which it does: one class more. */
+.sw-ds-reveal [data-sw-reveal] .sw-reveal-item.is-in { opacity: 1; transform: translateY(0); }
+/* Subtle stagger when several items reveal together (same row). Sits on
+   the item itself rather than on a state class, so it works whichever
+   flag is doing the hiding. */
+[data-sw-reveal] .sw-reveal-item:nth-child(2) { transition-delay: .08s; }
+[data-sw-reveal] .sw-reveal-item:nth-child(3) { transition-delay: .16s; }
+[data-sw-reveal] .sw-reveal-item:nth-child(4) { transition-delay: .24s; }
 
 
 /* ================================================================
@@ -1745,4 +1780,67 @@ button:hover .sw-bubble-icon {
     animation-iteration-count: 1 !important;
     transition-duration: .001ms !important;
   }
+}
+
+
+/* ================================================================
+   LEGACY COMPAT — pages built before the Bootstrap migration
+   ----------------------------------------------------------------
+   Three components used to lay themselves out with CSS Grid on a
+   wrapper of their own, before they were rewritten to use plain
+   Bootstrap row/col. Those wrapper rules were deleted when the
+   components were migrated — which silently broke every page that
+   still carried the older markup, because the wrapper suddenly had
+   no layout at all and its children stacked.
+
+   These rules bring the old wrappers back so that migrated and
+   un-migrated markup can live side by side on the same site. They
+   are a transitional layer, not part of the design system: nothing
+   new should ever use these class names. Once no page uses them any
+   more (the converter tool in the plugin admin reports which), this
+   whole block can go.
+
+   Kept byte-identical to the pre-migration rules on purpose, so an
+   un-migrated page renders exactly as it did before.
+   ================================================================ */
+
+/* HERO — .sw-hero-grid (now: .row + .col-*) */
+.sw-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+/* The gallery visual needs less width than the big single mockup, so
+   the copy column gets more room. :has() outranks the plain-class
+   mobile override below, so it has to stay inside this min-width
+   guard or it would beat the single-column collapse. */
+@media (min-width: 992px) {
+  .sw-hero-grid:has(.sw-hero-gallery) {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  }
+}
+@media (max-width: 991.98px) {
+  .sw-hero-grid { grid-template-columns: 1fr; }
+}
+
+/* CONTENT + 2 IMAGES — .sw-content2img-grid (now: .row + .col-*) */
+.sw-content2img-grid {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+@media (max-width: 991.98px) {
+  .sw-content2img-grid { grid-template-columns: 1fr; }
+}
+
+/* SERVICE HUB — .sw-hub-grid (now: .row + .col-*) */
+.sw-hub-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+@media (max-width: 767.98px) {
+  .sw-hub-grid { grid-template-columns: 1fr; }
 }

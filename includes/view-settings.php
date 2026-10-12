@@ -24,6 +24,7 @@ foreach ( $schema as $gkey => $group ) {
 $tabs['presets'] = array( 'title' => 'Presety',  'icon' => 'images-alt2' );
 $tabs['help']    = array( 'title' => 'Nápověda', 'icon' => 'editor-help' );
 $tabs['library'] = array( 'title' => 'Komponenty', 'icon' => 'block-default' );
+$tabs['convert'] = array( 'title' => 'Převod HTML', 'icon' => 'update' );
 ?>
 <div class="wrap swds-app" id="swds-wrap">
 
@@ -228,6 +229,45 @@ $tabs['library'] = array( 'title' => 'Komponenty', 'icon' => 'block-default' );
                     </div>
                 </div>
             <?php endforeach; ?>
+        </div>
+
+        <?php /* ---------- Converter ----------
+            Takes a section that was pasted into a page before the
+            Bootstrap migration and brings it up to the current shape.
+            Runs entirely in the browser: no round trip, no saving,
+            nothing touched until you copy the result out yourself.
+
+            The rules it applies are not written down here — they are
+            read out of the bundled components by SWDS_Library::lc_hints(),
+            so the converter keeps matching the library as it changes
+            instead of drifting away from it. */
+        $hints = SWDS_Library::lc_hints();
+        ?>
+        <div class="swds-panel" data-panel="convert">
+            <p class="swds-intro">Máte na stránce sekci vloženou ze starší verze knihovny? Vložte její HTML sem. Nástroj ho převede na současnou podobu — Bootstrap <code>row</code>/<code>col</code> místo starých mřížek, doplní <code>lc-block</code> a <code>editable</code> pro LiveCanvas a vyčistí zbytky, které do kódu zapsal starší runtime. <strong>Nic se nikam neukládá</strong>, výsledek si odnesete tlačítkem Kopírovat.</p>
+
+            <div class="swds-conv">
+                <div class="swds-conv-col">
+                    <label class="swds-conv-label" for="swds-conv-in">Staré HTML</label>
+                    <textarea id="swds-conv-in" class="swds-code swds-conv-area" rows="16" spellcheck="false" placeholder="Zkopírujte sem HTML sekce z LiveCanvasu…"></textarea>
+                </div>
+                <div class="swds-conv-col">
+                    <label class="swds-conv-label" for="swds-conv-out">Převedené HTML</label>
+                    <textarea id="swds-conv-out" class="swds-code swds-conv-area" rows="16" spellcheck="false" readonly></textarea>
+                </div>
+            </div>
+
+            <p style="margin:14px 0 18px;">
+                <button type="button" class="button button-primary" id="swds-conv-run">Převést</button>
+                <button type="button" class="button swds-copy" data-target="swds-conv-out">Kopírovat HTML</button>
+                <button type="button" class="button" id="swds-conv-clear">Vyčistit</button>
+            </p>
+
+            <div id="swds-conv-report" class="swds-conv-report" hidden></div>
+
+            <script type="application/json" id="swds-lc-hints"><?php
+                echo wp_json_encode( $hints );
+            ?></script>
         </div>
 
         <?php /* ---------- Sticky action bar (hidden on help/library/presets via JS) ---------- */ ?>
