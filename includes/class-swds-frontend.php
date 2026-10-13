@@ -14,6 +14,63 @@ class SWDS_Frontend {
         // Priority 1: must land before the stylesheets so the flag is set
         // on <html> before the browser paints anything.
         add_action( 'wp_head', array( $this, 'reveal_flag' ), 1 );
+        // Priority 999: after the stylesheets, so the overrides win.
+        add_action( 'wp_head', array( $this, 'kill_css' ), 999 );
+    }
+
+    /**
+     * Diagnostic switch: ?swds-kill=anim|grad|canvas|hero|reveal|type
+     *
+     * Neutralises one group of rules from the stylesheet, for one request,
+     * by printing overrides after it. Where ?swds-off=css answers "is it
+     * the stylesheet at all", this answers "which part of it".
+     *
+     * Same reasoning as off(): it only ever takes styling away, so it
+     * needs no capability check and works for a logged-out measuring tool.
+     * Temporary — remove once the question it was added for is answered.
+     */
+    public function kill_css() {
+        if ( empty( $_GET['swds-kill'] ) ) {
+            return;
+        }
+        $raw   = sanitize_text_field( wp_unslash( $_GET['swds-kill'] ) );
+        $parts = array_map( 'trim', explode( ',', $raw ) );
+        $all   = in_array( 'all', $parts, true );
+        $want  = function ( $k ) use ( $parts, $all ) {
+            return $all || in_array( $k, $parts, true );
+        };
+
+        $css = '';
+
+        // Entrance animations — the hero copy and the gallery cards.
+        if ( $want( 'anim' ) ) {
+            $css .= '.sw-fade-in,.sw-fade-in-2,.sw-fade-in-3,.sw-shot{animation:none!important;opacity:1!important;transform:none!important;scale:1!important;filter:none!important}';
+        }
+        // Gradient headline text (painted through background-clip, so the
+        // text itself is transparent).
+        if ( $want( 'grad' ) ) {
+            $css .= '.sw-h-gradient span{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:inherit!important;-webkit-text-fill-color:currentColor!important}';
+        }
+        // The page-wide wrapper: its gradient background and stacking context.
+        if ( $want( 'canvas' ) ) {
+            $css .= '.sw-canvas{background:none!important;isolation:auto!important;position:static!important}.sw-canvas::before,.sw-canvas::after{display:none!important}';
+        }
+        // The hero gallery's absolute positioning and rotation.
+        if ( $want( 'hero' ) ) {
+            $css .= '.sw-hero-gallery{height:auto!important}.sw-shot{position:static!important;width:auto!important;rotate:none!important;animation:none!important;opacity:1!important;scale:1!important}';
+        }
+        // Scroll-in reveal: show everything straight away.
+        if ( $want( 'reveal' ) ) {
+            $css .= '[data-sw-reveal] .sw-reveal-item{opacity:1!important;transform:none!important}';
+        }
+        // Headline sizing and letter-spacing.
+        if ( $want( 'type' ) ) {
+            $css .= '.sw-h,.sw-h-display,.sw-h-large,.sw-h-display--wide{font-size:2rem!important;letter-spacing:normal!important;line-height:1.2!important}';
+        }
+
+        if ( $css ) {
+            echo "<style id=\"swds-kill\">" . $css . "</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput
+        }
     }
 
     /**

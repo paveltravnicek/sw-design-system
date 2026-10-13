@@ -204,6 +204,12 @@ class SWDS_Generator {
         $vars['--sw-reveal-distance'] = $motionOn ? $rDist : '0px';
         $vars['--sw-reveal-duration'] = $motionOn ? $rDur  : '.001ms';
 
+        // Entrance animations (.sw-fade-in*, .sw-shot). Motion off has to
+        // reach these too, otherwise the hero keeps fading while the rest
+        // of the page stands still.
+        $vars['--sw-fade-duration']    = $motionOn ? '.8s' : '.001ms';
+        $vars['--sw-fade-delay-scale'] = $motionOn ? '1'   : '0';
+
         // Screenshot scroll: animate only when motion is on (paused = 0s).
         $vars['--sw-scroll-play']     = $motionOn ? 'running' : 'paused';
         $vars['--sw-scroll-duration'] = '15s';

@@ -70,6 +70,14 @@
      opacity 0 is invisible to Chrome's paint metrics and can never be
      the Largest Contentful Paint. */
   --sw-fade-floor: .01;
+  /* Entrance animations are tokenised so that turning Motion off in the
+     admin really turns them off. Before, only the reveal and the
+     screenshot pan were tokenised and these three stayed hardcoded —
+     so "motion off" left the hero still fading while everything else
+     stood still, which looked like a glitch rather than a setting. */
+  --sw-fade-duration: .8s;
+  --sw-fade-delay: .08s;
+  --sw-fade-delay-scale: 1;
   --sw-reveal-distance: 28px;
   --sw-reveal-duration: .8s;
   --sw-scroll-duration: 15s;
@@ -353,9 +361,9 @@
   100%    { object-position: center bottom; }
 }
 
-.sw-fade-in   { animation: swFadeUp .8s .16s ease both; }
-.sw-fade-in-2 { animation: swFadeUp .8s .24s ease both; }
-.sw-fade-in-3 { animation: swFadeUp .8s .32s ease both; }
+.sw-fade-in   { animation: swFadeUp var(--sw-fade-duration, .8s) calc(var(--sw-fade-delay, .08s) * 2 * var(--sw-fade-delay-scale, 1)) ease both; }
+.sw-fade-in-2 { animation: swFadeUp var(--sw-fade-duration, .8s) calc(var(--sw-fade-delay, .08s) * 3 * var(--sw-fade-delay-scale, 1)) ease both; }
+.sw-fade-in-3 { animation: swFadeUp var(--sw-fade-duration, .8s) calc(var(--sw-fade-delay, .08s) * 4 * var(--sw-fade-delay-scale, 1)) ease both; }
 
 /* The hidden state is keyed on TWO flags, and this pairing is the whole
    point — each flag is only ever set by code that also guarantees its
@@ -562,7 +570,7 @@
      good, with nothing left to show them. Written this way, a missing
      keyframe costs the animation and nothing else. */
   animation:
-    swShotIn .7s var(--shot-in-delay, 0s) cubic-bezier(.22, .7, .3, 1) both,
+    swShotIn var(--sw-fade-duration, .8s) calc(var(--shot-in-delay, 0s) * var(--sw-fade-delay-scale, 1)) cubic-bezier(.22, .7, .3, 1) both,
     swShotFloat var(--shot-float-dur, 7s) var(--shot-float-delay, .8s) ease-in-out infinite;
   animation-play-state: running, var(--sw-scroll-play, running);
 }
