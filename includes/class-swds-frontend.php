@@ -51,6 +51,18 @@ class SWDS_Frontend {
         if ( $want( 'grad' ) ) {
             $css .= '.sw-h-gradient span{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:inherit!important;-webkit-text-fill-color:currentColor!important}';
         }
+        // Candidate fix 1 — keep the gradient exactly as it looks, but give
+        // the glyphs a hundredth of a percent of fill instead of none at
+        // all, so they count as painted text. Same idea as --sw-fade-floor.
+        if ( $want( 'grad2' ) ) {
+            $css .= '.sw-h-gradient span{color:rgba(255,255,255,.01)!important;-webkit-text-fill-color:rgba(255,255,255,.01)!important}';
+        }
+        // Candidate fix 2 — drop the clipping altogether and colour the
+        // span with a solid accent. Visibly different, but nothing about
+        // it is transparent.
+        if ( $want( 'grad3' ) ) {
+            $css .= '.sw-h-gradient span{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:var(--sw-blue-2,#5cc8ff)!important;-webkit-text-fill-color:var(--sw-blue-2,#5cc8ff)!important}';
+        }
         // The page-wide wrapper: its gradient background and stacking context.
         if ( $want( 'canvas' ) ) {
             $css .= '.sw-canvas{background:none!important;isolation:auto!important;position:static!important}.sw-canvas::before,.sw-canvas::after{display:none!important}';
