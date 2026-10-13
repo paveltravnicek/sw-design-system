@@ -16,6 +16,7 @@ class SWDS_Frontend {
         add_action( 'wp_head', array( $this, 'reveal_flag' ), 1 );
         // Priority 999: after the stylesheets, so the overrides win.
         add_action( 'wp_head', array( $this, 'kill_css' ), 999 );
+        add_action( 'wp_head', array( $this, 'partial_css' ), 2 );
     }
 
     /**
@@ -75,6 +76,13 @@ class SWDS_Frontend {
         if ( $want( 'reveal' ) ) {
             $css .= '[data-sw-reveal] .sw-reveal-item{opacity:1!important;transform:none!important}';
         }
+        // The never-ending ones: the floating gallery cards and the panning
+        // screenshots. Dropped rather than paused, because pausing would
+        // freeze them at their first frame.
+        if ( $want( 'float' ) ) {
+            $css .= '.sw-shot{animation-name:swShotIn!important}'
+                 . '.sw-browser-page img,.sw-phone-screen img{animation:none!important}';
+        }
         // Headline sizing and letter-spacing.
         if ( $want( 'type' ) ) {
             $css .= '.sw-h,.sw-h-display,.sw-h-large,.sw-h-display--wide{font-size:2rem!important;letter-spacing:normal!important;line-height:1.2!important}';
@@ -83,6 +91,122 @@ class SWDS_Frontend {
         if ( $css ) {
             echo "<style id=\"swds-kill\">" . $css . "</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput
         }
+    }
+
+    /**
+     * Diagnostic switch: ?swds-css=<from>-<to> — serve only part of the
+     * stylesheet, as a percentage range of its top-level rules.
+     *
+     *   ?swds-css=0-50    first half
+     *   ?swds-css=50-100  second half
+     *
+     * The point is a bisection that does not depend on guessing which
+     * rules matter: halve, measure, halve the failing half again. Six or
+     * seven runs land on the rule whatever it turns out to be.
+     *
+     * The :root block always comes along, whatever the range, so that
+     * custom properties keep their values and a missing variable never
+     * looks like a finding.
+     */
+    public function partial_css() {
+        $range = $this->css_range();
+        if ( ! $range ) {
+            return;
+        }
+        list( $from, $to ) = $range;
+
+        $file = SWDS_DIR . 'assets/sw-design-system.css';
+        if ( ! is_readable( $file ) ) {
+            return;
+        }
+        $rules = self::split_rules( (string) file_get_contents( $file ) );
+        $total = count( $rules );
+        if ( ! $total ) {
+            return;
+        }
+
+        $start = (int) floor( $total * $from / 100 );
+        $end   = (int) ceil( $total * $to / 100 );
+        $slice = array_slice( $rules, $start, max( 0, $end - $start ) );
+
+        // Keep :root wherever it lives, so variables always resolve.
+        $roots = array();
+        foreach ( $rules as $i => $r ) {
+            if ( $i >= $start && $i < $end ) { continue; }
+            if ( false !== strpos( $r, ':root' ) && false !== strpos( $r, '--sw-' ) ) {
+                $roots[] = $r;
+            }
+        }
+
+        printf(
+            "<!-- swds-css: pravidel celkem %d, posílám %d–%d -->\n<style id=\"swds-partial\">%s</style>\n",
+            $total,
+            $start + 1,
+            $end,
+            implode( '', $roots ) . implode( '', $slice ) // phpcs:ignore WordPress.Security.EscapeOutput
+        );
+    }
+
+    /** Parse ?swds-css into a clamped [from, to] percentage pair, or false. */
+    private function css_range() {
+        if ( empty( $_GET['swds-css'] ) ) {
+            return false;
+        }
+        $raw = sanitize_text_field( wp_unslash( $_GET['swds-css'] ) );
+        if ( ! preg_match( '/^(\d{1,3})\s*-\s*(\d{1,3})$/', $raw, $m ) ) {
+            return false;
+        }
+        $from = max( 0, min( 100, (int) $m[1] ) );
+        $to   = max( 0, min( 100, (int) $m[2] ) );
+
+        return ( $to > $from ) ? array( $from, $to ) : false;
+    }
+
+    /**
+     * Split a stylesheet into top-level rules.
+     *
+     * Brace counting, with comments and strings skipped so a brace inside
+     * either cannot throw the depth off. An @media block counts as one
+     * rule, which is what we want — a range must never cut a block open.
+     *
+     * @return array<int,string>
+     */
+    private static function split_rules( $css ) {
+        $out   = array();
+        $len   = strlen( $css );
+        $depth = 0;
+        $start = 0;
+        $i     = 0;
+
+        while ( $i < $len ) {
+            $c = $css[ $i ];
+
+            if ( '/' === $c && $i + 1 < $len && '*' === $css[ $i + 1 ] ) {
+                $close = strpos( $css, '*/', $i + 2 );
+                $i     = ( false === $close ) ? $len : $close + 2;
+                continue;
+            }
+            if ( '"' === $c || "'" === $c ) {
+                $q = $c;
+                $i++;
+                while ( $i < $len && $css[ $i ] !== $q ) {
+                    $i += ( '\\' === $css[ $i ] ) ? 2 : 1;
+                }
+                $i++;
+                continue;
+            }
+            if ( '{' === $c ) { $depth++; }
+            if ( '}' === $c ) {
+                $depth--;
+                if ( $depth <= 0 ) {
+                    $out[] = substr( $css, $start, $i - $start + 1 );
+                    $start = $i + 1;
+                    $depth = 0;
+                }
+            }
+            $i++;
+        }
+        return $out;
     }
 
     /**
@@ -151,7 +275,9 @@ class SWDS_Frontend {
 
     public function enqueue() {
         // 1) Static component stylesheet (contains default :root as fallback).
-        if ( ! $this->off( 'css' ) ) {
+        // A requested slice replaces the stylesheet entirely (printed inline
+        // by partial_css), so the full file must not load alongside it.
+        if ( ! $this->off( 'css' ) && ! $this->css_range() ) {
             wp_enqueue_style(
                 'sw-design-system',
                 SWDS_URL . 'assets/sw-design-system.css',
