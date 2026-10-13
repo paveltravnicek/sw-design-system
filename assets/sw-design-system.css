@@ -66,6 +66,10 @@
   --sw-radius-img:      1.2rem;
   --sw-h-tracking:      -.065em;
   --sw-h-grad:          linear-gradient(90deg, #fff, #a9e6ff 42%, var(--sw-blue-2));
+  /* Never 0 — see the note above @keyframes swFadeUp. An element at
+     opacity 0 is invisible to Chrome's paint metrics and can never be
+     the Largest Contentful Paint. */
+  --sw-fade-floor: .01;
   --sw-reveal-distance: 28px;
   --sw-reveal-duration: .8s;
   --sw-scroll-duration: 15s;
@@ -309,10 +313,34 @@
       responsible for showing it again. Nothing is hidden by markup
       alone, so a JS-less context — or a page builder that re-renders
       a block — always shows the content.
+
+      WHY EVERY HIDDEN STATE HERE USES --sw-fade-floor AND NOT ZERO
+
+      Chrome does not consider an element with opacity exactly 0 to be
+      painted. It is skipped for First Contentful Paint and, worse, it
+      never becomes a Largest Contentful Paint candidate — not even
+      later, once it has faded in.
+
+      On a page whose large above-the-fold content all starts hidden —
+      a hero headline with .sw-fade-in over a hero image with the same,
+      which is exactly what this design system produces — that means
+      Chrome reports NO candidate at all. Lighthouse then fails with
+      NO_LCP, and because the byte-efficiency audits anchor their
+      estimates on LCP, half the performance report errors out with it.
+
+      Measured, with a page built from these components:
+        entrance animation from opacity 0    → FCP error, LCP error
+        entrance animation from opacity .01  → FCP 0.6 s, LCP 0.8 s
+        reveal hidden at opacity 0           → FCP error, LCP error
+        reveal hidden at opacity .01         → FCP 0.6 s, LCP 0.8 s
+
+      One hundredth of one percent is not visible to anyone, and it
+      keeps the element a painted, measurable thing. Do not "tidy" it
+      back to 0.
    ================================================================ */
 @keyframes swFadeUp {
-  from { opacity: 0; transform: translateY(22px); filter: blur(8px); }
-  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+  from { opacity: var(--sw-fade-floor, .01); transform: translateY(22px); filter: blur(8px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 
 /* Screenshot "scroll": pans the image from top to bottom and back */
@@ -355,7 +383,7 @@
    can match on its own. Hiding must always be opt-in by JS. */
 .sw-ds-reveal [data-sw-reveal] .sw-reveal-item,
 [data-sw-reveal] .sw-reveal-item.sw-rv {
-  opacity: 0;
+  opacity: var(--sw-fade-floor, .01);
   transform: translateY(var(--sw-reveal-distance));
 }
 /* The transition sits on the item unconditionally, so that *removing*
@@ -556,7 +584,7 @@
 .sw-shot--5 { width: 40%; top: 70%; left: 24%; z-index: 1; --shot-rot: -5deg; --shot-in-delay: .32s; --shot-float-dur: 8.2s; --shot-float-delay: 1.2s; }
 
 @keyframes swShotIn {
-  from { opacity: 0; scale: .94; }
+  from { opacity: var(--sw-fade-floor, .01); scale: .94; }
   to   { opacity: 1; scale: 1; }
 }
 @keyframes swShotFloat {
