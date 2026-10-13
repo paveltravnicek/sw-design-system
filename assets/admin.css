@@ -282,3 +282,13 @@
   .swds-usage-act { text-align: left; margin-top: 4px; }
   .swds-usage-act .button { margin: 0 5px 0 0; }
 }
+
+.swds-usage-dead { max-width: 900px; line-height: 2.1; }
+.swds-usage-dead code {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 12px;
+  margin-right: 3px;
+}

@@ -207,6 +207,7 @@ class SWDS_Generator {
         // Entrance animations (.sw-fade-in*, .sw-shot). Motion off has to
         // reach these too, otherwise the hero keeps fading while the rest
         // of the page stands still.
+        $vars['--sw-motion']           = $motionOn ? '1' : '0';
         $vars['--sw-fade-duration']    = $motionOn ? '.8s' : '.001ms';
         $vars['--sw-fade-delay-scale'] = $motionOn ? '1'   : '0';
 

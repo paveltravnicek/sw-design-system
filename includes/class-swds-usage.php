@@ -199,8 +199,18 @@ class SWDS_Usage {
         $capped = count( $posts ) > self::MAX_POSTS;
         if ( $capped ) { array_pop( $posts ); }
 
-        $rows = array();
+        $rows      = array();
+        $seen_cls  = array();
+
         foreach ( $posts as $post ) {
+            // Every sw- class that appears anywhere in this page's content,
+            // not only inside recognised sections — a class can live in a
+            // LiveCanvas dynamic view, a custom block or hand-written
+            // markup, and it is still very much in use.
+            if ( preg_match_all( '#\bsw-[a-z0-9-]+#', $post->post_content, $cm ) ) {
+                foreach ( $cm[0] as $c ) { $seen_cls[ $c ] = true; }
+            }
+
             foreach ( self::sections( $post->post_content ) as $index => $sec ) {
                 $row = self::classify( $sec, $cat );
                 if ( ! $row ) { continue; }   // a .sw-section we don't recognise
@@ -218,6 +228,7 @@ class SWDS_Usage {
             'scanned' => count( $posts ),
             'capped'  => $capped,
             'time'    => time(),
+            'unused'  => self::unused_classes( array_keys( $seen_cls ) ),
         );
         set_transient( self::TRANSIENT, $out, self::TTL );
         return $out;
@@ -335,6 +346,56 @@ class SWDS_Usage {
             'issues'  => $issues,
             'bytes'   => strlen( $html ),
         );
+    }
+
+    /**
+     * Rules in the stylesheet that nothing on this site uses.
+     *
+     * "Used" means: a bundled component uses it, OR it appears somewhere
+     * in a page's content, OR the runtime adds it. That middle one is the
+     * reason this lives here and not in a build script — a class can be
+     * used by a LiveCanvas dynamic view or by markup written by hand, and
+     * a stylesheet-versus-components comparison would call it dead and be
+     * wrong. The news-tile skin is exactly that case.
+     *
+     * Still only a shortlist to review by eye, never something to delete
+     * automatically: a class may belong to a page that was not scanned, a
+     * draft, or a site that shares this plugin.
+     *
+     * @param array<int,string> $in_content Classes found in page content.
+     * @return array<int,string>
+     */
+    public static function unused_classes( $in_content ) {
+        $css_file = SWDS_DIR . 'assets/sw-design-system.css';
+        if ( ! is_readable( $css_file ) ) {
+            return array();
+        }
+
+        $css = (string) file_get_contents( $css_file );
+        if ( ! preg_match_all( '#\.(sw-[a-z0-9-]+)#', $css, $m ) ) {
+            return array();
+        }
+        $in_css = array_unique( $m[1] );
+
+        $used = array_flip( $in_content );
+
+        // Bundled components.
+        foreach ( glob( SWDS_DIR . 'components/*.html' ) as $f ) {
+            if ( preg_match_all( '#\bsw-[a-z0-9-]+#', (string) file_get_contents( $f ), $cm ) ) {
+                foreach ( $cm[0] as $c ) { $used[ $c ] = true; }
+            }
+        }
+        // Added at runtime, so they never appear in saved markup.
+        foreach ( array( 'sw-anim-on', 'sw-rv', 'sw-ds-reveal' ) as $c ) {
+            $used[ $c ] = true;
+        }
+
+        $out = array();
+        foreach ( $in_css as $c ) {
+            if ( ! isset( $used[ $c ] ) ) { $out[] = $c; }
+        }
+        sort( $out );
+        return $out;
     }
 
     /** Drop the cached scan — called after the library is refreshed or the plugin updated. */

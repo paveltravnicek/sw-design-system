@@ -48,6 +48,20 @@
   }
 
   var noMotion   = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* True when movement is unwanted — either the visitor's own system
+     setting, or the Motion switch in this plugin's admin, which reaches
+     us as --sw-motion: 0. Checked on every boot rather than cached, so a
+     settings change takes effect on the next page load with no stale
+     copy of the answer sitting around. */
+  function motionOff() {
+    if (noMotion.matches) { return true; }
+    try {
+      return getComputedStyle(H).getPropertyValue('--sw-motion').trim() === '0';
+    } catch (e) {
+      return false;
+    }
+  }
   var parallaxOK = window.matchMedia('(min-width: 992px) and (pointer: fine)');
   var hoverOK    = window.matchMedia('(hover: hover) and (pointer: fine)');
 
@@ -56,6 +70,8 @@
   var pending = new WeakSet();   // reveal items the observer is waiting on
   var shown   = new WeakSet();   // reveal items already dealt with
   var io      = null;
+  var idleIO        = null;        // pauses the looping decorations off screen
+  var watchedStages = new WeakSet();
 
   /* ----------------------------------------------------------------
      Editor detection
@@ -154,7 +170,7 @@
 
     /* No animation wanted, not possible, or we are in a builder:
        drop the pre-paint flag and leave everything visible. */
-    if (!containers.length || EDITOR || noMotion.matches ||
+    if (!containers.length || EDITOR || motionOff() ||
         !('IntersectionObserver' in window)) {
       H.classList.remove('sw-ds-reveal');
       return;
@@ -229,7 +245,7 @@
         wired.add(stage);
 
         var onMove = function (e) {
-          if (!parallaxOK.matches || noMotion.matches) return;
+          if (!parallaxOK.matches || motionOff()) return;
           var r = stage.getBoundingClientRect();
           var x = (e.clientX - r.left) / r.width  - 0.5;
           var y = (e.clientY - r.top)  / r.height - 0.5;
@@ -394,6 +410,49 @@
   }
 
   /* ----------------------------------------------------------------
+     Pause the never-ending animations while they are off screen
+
+     Two of the decorations loop forever: the gallery cards drifting up
+     and down, and the screenshots panning inside the device mockups.
+     Left alone they keep the compositor — and, for the panning ones,
+     the painter — busy for as long as the tab is open, whether or not
+     anybody can see them. On a long page that is most of the time.
+
+     The switch is the same --sw-scroll-play custom property the admin's
+     Motion setting uses, set on the element rather than globally. That
+     matters: these elements carry two animations, and setting
+     animation-play-state directly would also freeze the entrance one
+     mid-flight. Only "paused" is ever written, and leaving the viewport
+     removes it again, so a site with Motion switched off globally stays
+     switched off.
+     ---------------------------------------------------------------- */
+  function initIdleAnimations(root) {
+    if (!('IntersectionObserver' in window)) { return; }
+
+    var stages = root.querySelectorAll('.sw-hero-gallery, .sw-hero-stage');
+    if (!stages.length) { return; }
+
+    if (!idleIO) {
+      idleIO = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          var el = entries[i].target;
+          if (entries[i].isIntersecting) {
+            el.style.removeProperty('--sw-scroll-play');
+          } else {
+            el.style.setProperty('--sw-scroll-play', 'paused');
+          }
+        }
+      }, { rootMargin: '200px' });
+    }
+
+    for (var s = 0; s < stages.length; s++) {
+      if (watchedStages.has(stages[s])) { continue; }
+      watchedStages.add(stages[s]);
+      idleIO.observe(stages[s]);
+    }
+  }
+
+  /* ----------------------------------------------------------------
      Boot / re-boot
 
      Everything above is idempotent and takes a root, so this can run
@@ -408,6 +467,7 @@
     initParallax(scope);
     initAccordions(scope);
     initSliders(scope);
+    initIdleAnimations(scope);
     updateNavbarOffset();
   }
 
@@ -430,7 +490,8 @@
      inserts nodes, so there is no feedback loop.
      ---------------------------------------------------------------- */
   var WATCH = '[data-sw-reveal], .sw-reveal-item, [data-sw-parallax],' +
-              '[data-sw-accordion], .sw-testimonials-slider';
+              '[data-sw-accordion], .sw-testimonials-slider,' +
+              '.sw-hero-gallery, .sw-hero-stage';
 
   if ('MutationObserver' in window) {
     var rescanTimer;
@@ -458,7 +519,7 @@
   /* Public handle. Kept truthy because the inline head script checks
      window.__swDS to decide whether its failsafe needs to fire. */
   window.__swDS = {
-    version: '2.20.9',
+    version: '2.21.1',
     editor: EDITOR,
     init: boot
   };

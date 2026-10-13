@@ -364,6 +364,25 @@ $tabs['convert'] = array( 'title' => 'Převod HTML', 'icon' => 'update' );
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
+
+            <?php if ( ! empty( $scan['unused'] ) ) : ?>
+                <div class="swds-usage-group">
+                    <h3 class="swds-usage-head">
+                        Styly, které nic na webu nepoužívá
+                        <span class="swds-usage-count"><?php echo count( $scan['unused'] ); ?></span>
+                    </h3>
+                    <p class="swds-help" style="max-width:860px;">
+                        Třídy, které jsou v šabloně stylů, ale nepoužívá je žádná komponenta ani žádná z prohledaných stránek.
+                        <strong>Je to podklad k projití očima, ne seznam ke smazání.</strong> Třída může patřit stránce,
+                        která se do výpisu nevešla, rozepsanému konceptu, nebo jinému webu se stejným pluginem.
+                    </p>
+                    <p class="swds-usage-dead">
+                        <?php foreach ( $scan['unused'] as $c ) : ?>
+                            <code>.<?php echo esc_html( $c ); ?></code>
+                        <?php endforeach; ?>
+                    </p>
+                </div>
+            <?php endif; ?>
         </div>
 
         <?php /* ---------- Converter ----------

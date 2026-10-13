@@ -75,6 +75,13 @@
      screenshot pan were tokenised and these three stayed hardcoded —
      so "motion off" left the hero still fading while everything else
      stood still, which looked like a glitch rather than a setting. */
+  /* Read by the runtime, not by any rule: 0 means the Motion switch in
+     the admin is off, and then nothing may be hidden waiting to be
+     scrolled to. Without this the runtime only ever saw the operating
+     system's "reduce motion" preference, so turning Motion off here left
+     the scroll-in reveal armed — content stayed hidden and then snapped
+     in, which looks worse than the animation it was meant to remove. */
+  --sw-motion: 1;
   --sw-fade-duration: .8s;
   --sw-fade-delay: .08s;
   --sw-fade-delay-scale: 1;
@@ -345,10 +352,30 @@
       One hundredth of one percent is not visible to anyone, and it
       keeps the element a painted, measurable thing. Do not "tidy" it
       back to 0.
+
+      AND WHY THE ABOVE-THE-FOLD ONE DOES NOT TOUCH OPACITY AT ALL
+
+      A floor of .01 makes the element countable, but it still means the
+      hero headline is, for the first fractions of a second, as good as
+      invisible — and everything a measuring tool concludes about this
+      page hangs on that one element. Chasing an intermittent NO_LCP
+      through a live site taught the lesson: the content that decides the
+      metric must not be mid-animation when it is measured. It should
+      simply be there.
+
+      So .sw-fade-in* — which is what the heroes use, i.e. the only
+      entrance animation that plays above the fold — animates POSITION
+      only. The headline is fully opaque in the very first frame and
+      slides the last few pixels into place. It still reads as an
+      entrance; it just cannot hide anything.
+
+      The opacity fade stays where it is harmless: the scroll-in reveal,
+      which by definition only plays on content the viewer has scrolled
+      to, and so is never the element a cold page load is judged by.
    ================================================================ */
 @keyframes swFadeUp {
-  from { opacity: var(--sw-fade-floor, .01); transform: translateY(22px); filter: blur(8px); }
-  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+  from { transform: translateY(22px); }
+  to   { transform: translateY(0); }
 }
 
 /* Screenshot "scroll": pans the image from top to bottom and back */
@@ -591,9 +618,13 @@
 .sw-shot--4 { width: 44%; top: 54%; left: 56%; z-index: 2; --shot-rot: 5deg;  --shot-in-delay: .24s; --shot-float-dur: 7.8s; --shot-float-delay: 1.1s; }
 .sw-shot--5 { width: 40%; top: 70%; left: 24%; z-index: 1; --shot-rot: -5deg; --shot-in-delay: .32s; --shot-float-dur: 8.2s; --shot-float-delay: 1.2s; }
 
+/* Scale only, no fade — same reasoning as swFadeUp above: these cards sit
+   in the hero, so on a wide screen they are above the fold and can be the
+   element the page's metrics are judged by. They settle into place rather
+   than appearing out of nothing. */
 @keyframes swShotIn {
-  from { opacity: var(--sw-fade-floor, .01); scale: .94; }
-  to   { opacity: 1; scale: 1; }
+  from { scale: .94; }
+  to   { scale: 1; }
 }
 @keyframes swShotFloat {
   0%, 100% { translate: 0 0; }
