@@ -523,8 +523,16 @@
   background: rgba(255, 255, 255, .06);
   aspect-ratio: 16 / 10;
   rotate: var(--shot-rot, 0deg);
-  opacity: 0;
-  scale: .94;
+  /* The hidden start state lives ONLY in the keyframe, held in place by
+     the `both` fill — deliberately not declared here as opacity: 0.
+
+     Same invariant as the reveal system: never leave an element hidden
+     by something that has to run before it can be seen again. A base
+     opacity: 0 here would mean that if @keyframes swShotIn ever fails to
+     reach the browser — a critical-CSS tool that inlines rules but drops
+     keyframes is the usual way — these cards would stay invisible for
+     good, with nothing left to show them. Written this way, a missing
+     keyframe costs the animation and nothing else. */
   animation:
     swShotIn .7s var(--shot-in-delay, 0s) cubic-bezier(.22, .7, .3, 1) both,
     swShotFloat var(--shot-float-dur, 7s) var(--shot-float-delay, .8s) ease-in-out infinite;
