@@ -372,6 +372,14 @@ class SWDS_Usage {
         }
 
         $css = (string) file_get_contents( $css_file );
+
+        // Comments first. This stylesheet explains itself at length and
+        // names classes while doing so, including ones that were removed
+        // years of versions ago. Reading those back as selectors put
+        // entries on the "nothing uses this" list that were never rules
+        // at all — .sw-news-card among them.
+        $css = (string) preg_replace( '#/\*.*?\*/#s', '', $css );
+
         if ( ! preg_match_all( '#\.(sw-[a-z0-9-]+)#', $css, $m ) ) {
             return array();
         }
