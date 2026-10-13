@@ -17,6 +17,28 @@ class SWDS_Frontend {
     }
 
     /**
+     * Diagnostic switch: ?swds-off=css|tokens|js|flag (comma-separated, or "all").
+     *
+     * Leaves out one piece of what this plugin puts on the page, for one
+     * request, so a measuring tool can be pointed at a URL instead of the
+     * plugin having to be edited or deactivated. It only ever REMOVES
+     * things — it cannot change or expose anything — which is why it needs
+     * no capability check and works for a logged-out tool like PageSpeed.
+     *
+     * Only for narrowing down a problem. Nothing links to these URLs and
+     * a normal visit is untouched.
+     */
+    private function off( $part ) {
+        if ( empty( $_GET['swds-off'] ) ) {
+            return false;
+        }
+        $raw   = sanitize_text_field( wp_unslash( $_GET['swds-off'] ) );
+        $parts = array_map( 'trim', explode( ',', $raw ) );
+
+        return in_array( 'all', $parts, true ) || in_array( $part, $parts, true );
+    }
+
+    /**
      * Marks <html> so reveal items are hidden from the very first paint.
      *
      * Without this the runtime JS (which sits in the footer) was the thing
@@ -45,6 +67,8 @@ class SWDS_Frontend {
      *     neither the runtime nor the timer can ever run.
      */
     public function reveal_flag() {
+        if ( $this->off( 'flag' ) ) { return; }
+
         echo "<script>try{(function(){var d=document.documentElement;"
            . "d.classList.add('sw-ds-reveal');"
            . "setTimeout(function(){d.classList.remove('sw-ds-reveal');"
@@ -58,15 +82,20 @@ class SWDS_Frontend {
 
     public function enqueue() {
         // 1) Static component stylesheet (contains default :root as fallback).
-        wp_enqueue_style(
-            'sw-design-system',
-            SWDS_URL . 'assets/sw-design-system.css',
-            array(),
-            SWDS_VERSION
-        );
+        if ( ! $this->off( 'css' ) ) {
+            wp_enqueue_style(
+                'sw-design-system',
+                SWDS_URL . 'assets/sw-design-system.css',
+                array(),
+                SWDS_VERSION
+            );
+        }
 
         // 2) Generated tokens — loaded AFTER, so it overrides the defaults.
-        if ( SWDS_Generator::exists() ) {
+        // Dropping the main stylesheet drops these with it: they are
+        // declared dependent on it, and on their own they would only set
+        // variables nothing reads.
+        if ( ! $this->off( 'tokens' ) && ! $this->off( 'css' ) && SWDS_Generator::exists() ) {
             wp_enqueue_style(
                 'sw-design-tokens',
                 SWDS_Generator::url(),
@@ -76,6 +105,8 @@ class SWDS_Frontend {
         }
 
         // 3) Runtime (reveal + parallax). Deferred, footer.
+        if ( $this->off( 'js' ) ) { return; }
+
         wp_enqueue_script(
             'sw-design-system',
             SWDS_URL . 'assets/sw-design-system.js',
