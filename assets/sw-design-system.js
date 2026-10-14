@@ -330,6 +330,18 @@
     var nav = D.querySelector('.navbar');
     var h = nav ? Math.ceil(nav.getBoundingClientRect().height) : 0;
     H.style.setProperty('--sw-navbar-h', h + 'px');
+
+    /* The header is fixed, so it holds no space of its own and the body
+       reserves it instead (see body:has(.sw-header) in the CSS). Measure
+       it rather than trusting the fallback: the bar's height moves with
+       the logo, the font and the breakpoint. Measured with the bar in
+       its resting state — never while it is tucked away — so a stale
+       value can't leave a gap at the top of the page. */
+    var bar = D.querySelector('.sw-header');
+    if (bar && !bar.classList.contains('sw-header--hidden')
+           && !bar.classList.contains('sw-header--stuck')) {
+      H.style.setProperty('--sw-header-h', Math.ceil(bar.getBoundingClientRect().height) + 'px');
+    }
   }
 
   /* ----------------------------------------------------------------
@@ -628,7 +640,7 @@
   /* Public handle. Kept truthy because the inline head script checks
      window.__swDS to decide whether its failsafe needs to fire. */
   window.__swDS = {
-    version: '2.31.0',
+    version: '2.32.0',
     editor: EDITOR,
     init: boot
   };

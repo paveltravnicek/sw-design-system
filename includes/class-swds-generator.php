@@ -169,10 +169,16 @@ class SWDS_Generator {
 
         // Typography — heading scale (clamp bounds)
         $scale = array(
-            'compact' => array( 'clamp(2.2rem,5vw,4.6rem)', 'clamp(1.8rem,4vw,3.4rem)', 'clamp(1.7rem,4vw,3.2rem)' ),
-            'normal'  => array( 'clamp(3rem,7vw,6.8rem)',   'clamp(2.2rem,5vw,4.8rem)', 'clamp(2rem,5vw,4.4rem)' ),
-            'large'   => array( 'clamp(3.4rem,8vw,8rem)',   'clamp(2.6rem,6vw,5.6rem)', 'clamp(2.4rem,6vw,5.2rem)' ),
-            'huge'    => array( 'clamp(3.8rem,9vw,9.5rem)',  'clamp(3rem,7vw,6.6rem)',   'clamp(2.8rem,7vw,6rem)' ),
+            // The display column was dialled back by a fifth across the
+            // board: .sw-h-display--wide used to hard-code a smaller size
+            // of its own, so two heroes side by side had different
+            // headline sizes and the admin's scale setting did not reach
+            // the wide one at all. The smaller size won; it is now the
+            // token, and the modifier only changes measure and leading.
+            'compact' => array( 'clamp(1.8rem,4vw,3.7rem)',  'clamp(1.8rem,4vw,3.4rem)', 'clamp(1.7rem,4vw,3.2rem)' ),
+            'normal'  => array( 'clamp(2.5rem,5.6vw,5.4rem)', 'clamp(2.2rem,5vw,4.8rem)', 'clamp(2rem,5vw,4.4rem)' ),
+            'large'   => array( 'clamp(2.7rem,6.4vw,6.4rem)', 'clamp(2.6rem,6vw,5.6rem)', 'clamp(2.4rem,6vw,5.2rem)' ),
+            'huge'    => array( 'clamp(3rem,7.2vw,7.6rem)',  'clamp(3rem,7vw,6.6rem)',   'clamp(2.8rem,7vw,6rem)' ),
         );
         list( $hD, $hL, $hC ) = $scale[ $s['heading_scale'] ] ?? $scale['normal'];
         $vars['--sw-h-display'] = $hD;

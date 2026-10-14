@@ -52,7 +52,7 @@
      NOT set here: it inherits from LiveCanvas/theme, same as everything
      else on the page. The design system is a layer on top of Bootstrap,
      not a replacement for it. */
-  --sw-h-display:   clamp(3rem, 7vw, 6.8rem);
+  --sw-h-display:   clamp(2.5rem, 5.6vw, 5.4rem);
   --sw-h-large:     clamp(2.2rem, 5vw, 4.8rem);
   --sw-h-cta:       clamp(2rem, 5vw, 4.4rem);
 
@@ -234,7 +234,6 @@
 .sw-h-display--wide { max-width: 22ch; line-height: .95; }
 @media (min-width: 992px) {
   .sw-h-display--wide {
-    font-size: clamp(2.5rem, 5.6vw, 5.4rem);
     max-width: 26ch;
     line-height: 1.05;
     text-wrap: wrap;
@@ -1891,31 +1890,38 @@ button:hover .sw-bubble-icon {
    bar simply stays put, which is a perfectly good header.
    ================================================================ */
 .sw-header {
-  position: sticky;
+  /* Fixed, not sticky, and that is a scar.
+
+     Sticky sticks inside its PARENT's box. Drop this bar into a theme
+     that wraps the header area in a box of its own — LiveCanvas's
+     #lc-header is exactly that, and it is the same height as the bar —
+     and there is nothing to stick within: the whole thing scrolls away
+     like any static element while the classes go on toggling far above
+     the viewport. Two releases went out before that was measured.
+
+     Fixed depends on no ancestor at all, which is the point. The price
+     is that it no longer holds its own space, so the body reserves it
+     below. */
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1030;              /* Bootstrap's own fixed-navbar layer */
   transition: transform .28s ease, box-shadow .2s ease, background-color .2s ease;
 }
 .sw-header--hidden { transform: translateY(-100%); }
 
-/* A sticky element sticks inside its PARENT's box, not the page. Drop
-   this bar into a theme that wraps the header area in a box of its own
-   — LiveCanvas's #lc-header is exactly that — and the parent is the
-   same height as the bar, so there is nothing to stick within and the
-   whole thing scrolls away like any static element. The classes still
-   toggle, the transform still applies; it is just happening far above
-   the viewport where nobody can see it.
-   So: whatever wraps the bar becomes the sticky one, the bar inside it
-   goes back to static, and the wrapper stops catching clicks while the
-   bar is away — otherwise an invisible strip would sit over the content
-   at the top of the screen. */
-:not(body):has(> .sw-header) {
-  position: sticky;
-  top: 0;
-  z-index: 1030;
+/* The space the fixed bar no longer occupies. The runtime measures the
+   real height into --sw-header-h; the fallback here is the height of
+   the stock header, so a page whose JS never arrives is still laid out
+   sensibly rather than with its first section tucked under the bar. */
+body:has(.sw-header) { padding-top: var(--sw-header-h, 6.625rem); }
+
+/* Logged in, WordPress puts its own fixed bar across the top. */
+.admin-bar .sw-header { top: var(--wp-admin--admin-bar--height, 32px); }
+@media (max-width: 782px) {
+  .admin-bar .sw-header { top: 46px; }
 }
-:not(body):has(> .sw-header) > .sw-header { position: static; }
-:not(body):has(> .sw-header--hidden) { pointer-events: none; }
 
 /* Once the page has moved at all, the bar separates itself from the
    content underneath: a touch of translucency and a soft edge. */
