@@ -1898,6 +1898,25 @@ button:hover .sw-bubble-icon {
 }
 .sw-header--hidden { transform: translateY(-100%); }
 
+/* A sticky element sticks inside its PARENT's box, not the page. Drop
+   this bar into a theme that wraps the header area in a box of its own
+   — LiveCanvas's #lc-header is exactly that — and the parent is the
+   same height as the bar, so there is nothing to stick within and the
+   whole thing scrolls away like any static element. The classes still
+   toggle, the transform still applies; it is just happening far above
+   the viewport where nobody can see it.
+   So: whatever wraps the bar becomes the sticky one, the bar inside it
+   goes back to static, and the wrapper stops catching clicks while the
+   bar is away — otherwise an invisible strip would sit over the content
+   at the top of the screen. */
+:not(body):has(> .sw-header) {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+:not(body):has(> .sw-header) > .sw-header { position: static; }
+:not(body):has(> .sw-header--hidden) { pointer-events: none; }
+
 /* Once the page has moved at all, the bar separates itself from the
    content underneath: a touch of translucency and a soft edge. */
 .sw-header--stuck {
