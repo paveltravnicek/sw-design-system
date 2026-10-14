@@ -248,6 +248,22 @@
           background-clip: text;
   color: var(--sw-h-grad-fallback, transparent);
   -webkit-text-fill-color: var(--sw-h-grad-fallback, transparent);
+
+  /* background-clip: text paints the gradient only inside the element's
+     own box, so any part of a glyph that reaches outside it is simply
+     not painted. Display headings run a line-height below 1, which
+     makes the box shorter than the letters: measured at 47px of box
+     against 54px of text, and the bottoms of ý, j, ů and the Czech
+     diacritics were the 7px that went missing. Reads as "a bit of the
+     last character got cut off".
+
+     Grow the paint area with padding and take the exact same amount
+     back with a negative margin, so nothing moves in the layout.
+     inline-block is needed for the padding to apply on all sides; the
+     text inside still wraps normally. */
+  display: inline-block;
+  padding: .08em .1em .2em 0;
+  margin: -.08em -.1em -.2em 0;
 }
 
 /* Optional: when the accent span covers most of a long sentence (not just
