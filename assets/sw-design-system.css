@@ -562,6 +562,23 @@
   height: auto;
 }
 
+/* Inside a hero the image frame sits right above the next section, and
+   --sw-shadow-deep reaches 160px below the box (40px offset + 120px blur)
+   while the section's own bottom padding is only 44–68px. The next
+   section paints over the remainder, so the shadow ended in a hard
+   horizontal line instead of fading out.
+
+   Two changes keep it inside its own section: a shadow tuned to finish
+   within ~58px, and a little extra bottom padding on the hero so even
+   the narrowest viewport has room for it. Other uses of .sw-hero-image
+   outside a hero keep the deep shadow. */
+.sw-hero .sw-hero-image {
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, .45),
+    0 0 36px rgba(0, 150, 226, .14);
+}
+.sw-hero { padding-bottom: calc(var(--sw-section-py) + 1.5rem); }
+
 /* ================================================================
    HERO: GALLERY VARIANT — cluster of floating website screenshots.
    Alternative to .sw-hero-stage (single browser+phone mockup).
