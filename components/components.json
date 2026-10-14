@@ -141,6 +141,11 @@
       "category": "pricing"
     },
     {
+      "title": "Reference (kompaktní)",
+      "file": "component-testimonials-compact.html",
+      "category": "testimonials"
+    },
+    {
       "title": "Reference (karusel)",
       "file": "component-testimonials-carousel.html",
       "category": "testimonials"

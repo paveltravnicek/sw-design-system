@@ -1418,7 +1418,60 @@
    scroller, a different UI need than the wrapping grids elsewhere,
    and Bootstrap doesn't ship a multi-item scroller primitive.
    ================================================================ */
+/* The track scrolls its own overflow, but the cards sticking out to the
+   right still counted toward the document's own scroll width — so on a
+   phone the whole page could be dragged sideways. Clipping here contains
+   it at the section, the same trick .sw-hero already uses; clip rather
+   than hidden so the cards' vertical shadows and the arrows are not cut. */
+.sw-testimonials { overflow-x: clip; }
+
 .sw-testimonials-intro { max-width: 62ch; margin: 0 0 clamp(2rem, 4vw, 3rem); }
+
+/* ---- Compact variant (testimonials@4) ----------------------------
+   Reviews are wildly uneven in length, which is what made the plain
+   grid look so empty: every card in a row stretched to the tallest one.
+   CSS columns let them pack instead, so the block is markedly shorter
+   for the same content. Three up front, the rest behind a native
+   <details> — that keeps the phone layout short without a slider.
+   No scroller, no JS, nothing that can push the page sideways. */
+.sw-testimonials-wall { columns: 1; column-gap: 1.25rem; }
+@media (min-width: 768px) { .sw-testimonials-wall { columns: 2; } }
+@media (min-width: 992px) { .sw-testimonials-wall { columns: 3; } }
+.sw-testimonials-wall > .sw-testimonial-card {
+  /* height:100% is for the grid/slider variants; in a column flow the
+     card has to size to its own content or the packing collapses. */
+  height: auto;
+  break-inside: avoid;
+  margin-bottom: 1.25rem;
+}
+
+.sw-testimonials-more { margin-top: .5rem; }
+.sw-testimonials-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .55rem .25rem;
+  font-weight: 650;
+  color: var(--sw-blue);
+  cursor: pointer;
+  list-style: none;
+}
+.sw-testimonials-more > summary::-webkit-details-marker { display: none; }
+.sw-testimonials-more > summary::after {
+  content: "";
+  width: .5rem; height: .5rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-.12em);
+  transition: transform .2s ease;
+}
+.sw-testimonials-more[open] > summary::after { transform: rotate(-135deg) translateY(-.12em); }
+.sw-testimonials-more > summary:focus-visible {
+  outline: 2px solid var(--sw-blue);
+  outline-offset: 3px;
+  border-radius: .35rem;
+}
+.sw-testimonials-more .sw-testimonials-wall { margin-top: 1.25rem; }
 .sw-testimonials-lead { margin: 1rem 0 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
 
 .sw-testimonials-slider { display: flex; align-items: center; gap: .75rem; }
