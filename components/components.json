@@ -141,7 +141,12 @@
       "category": "pricing"
     },
     {
-      "title": "Reference",
+      "title": "Reference (karusel)",
+      "file": "component-testimonials-carousel.html",
+      "category": "testimonials"
+    },
+    {
+      "title": "Reference (mřížka)",
       "file": "component-testimonials.html",
       "category": "testimonials"
     },
