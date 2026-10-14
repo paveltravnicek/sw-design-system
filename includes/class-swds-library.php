@@ -156,12 +156,18 @@ class SWDS_Library {
             return $cached;
         }
 
-        $remote = self::fetch_remote();
-        if ( ! empty( $remote ) ) {
-            set_transient( self::TRANSIENT, $remote, self::TTL );
-            return $remote;
-        }
-
+        /* The files bundled in this plugin version win by default.
+         *
+         * This used to fetch GitHub here and only fall back to the local
+         * files when the network failed. That was backwards: installing a
+         * new plugin zip put new component files on disk, and the library
+         * went on serving whatever was on the GitHub branch — so a fixed
+         * component kept coming out of the library broken, with nothing in
+         * the UI to suggest why.
+         *
+         * Pulling from GitHub is still available, but only when it is
+         * actually asked for: the "Načíst z GitHubu" button passes
+         * $force_refresh and takes the branch above. */
         return self::load_local();
     }
 
