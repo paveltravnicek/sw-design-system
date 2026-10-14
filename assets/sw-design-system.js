@@ -33,6 +33,7 @@
      - Accordion   : [data-sw-accordion] with .sw-faq-item children.
      - Navbar offs.: measures .navbar into --sw-navbar-h for sticky.
      - Slider      : .sw-testimonials-slider arrows + edge fades.
+     - Header      : .sw-header hides on scroll down, returns on up.
    ================================================================ */
 (function () {
   'use strict';
@@ -332,6 +333,98 @@
   }
 
   /* ----------------------------------------------------------------
+     Sticky header that steps out of the way
+
+     Scrolling down past the first screenful slides the bar up out of
+     sight; the first upward move brings it straight back. Transform
+     only — the bar keeps its space in the layout and is painted from
+     the first frame, so none of this touches the page's paint metrics.
+
+     It stays put whenever hiding it would take something away from
+     the visitor: the mobile menu or a dropdown is open, focus is
+     inside it (keyboard users tab into the nav), or we are near the
+     top of the page.
+
+     RULE 1 is honoured by the catch: if anything in here ever throws,
+     the bar is put back and the listener detaches, rather than leaving
+     a header stuck off-screen with the only code that could return it
+     now broken.
+     ---------------------------------------------------------------- */
+  var headersArmed = new WeakSet();
+
+  function initHeaders(root) {
+    var bars = root.querySelectorAll('.sw-header');
+    for (var i = 0; i < bars.length; i++) {
+      var bar = bars[i];
+      if (headersArmed.has(bar)) { continue; }
+      headersArmed.add(bar);
+      // In the builder the bar never moves: the preview re-renders
+      // constantly and a half-hidden header would only be in the way.
+      if (!EDITOR) { armHeader(bar); }
+    }
+  }
+
+  function armHeader(bar) {
+    var lastY   = window.pageYOffset || 0;
+    var ticking = false;
+    var MIN_MOVE = 6;      // ignore sub-pixel jitter and rubber-banding
+
+    function keyboardInside() {
+      /* Only a keyboard user pins the bar open. ":focus-visible" is the
+         difference that matters: clicking the hamburger leaves the
+         button focused, and testing for plain focus meant that after
+         one tap the bar never hid again for the rest of the visit.
+         Guarded because the selector throws where it is unsupported. */
+      try { return !!bar.querySelector(':focus-visible'); }
+      catch (e) { return false; }
+    }
+
+    function heldOpen() {
+      // Bootstrap marks both the collapsed menu and an open dropdown
+      // with .show, so one query covers both.
+      return !!bar.querySelector('.navbar-collapse.show, .dropdown-menu.show') ||
+             keyboardInside();
+    }
+
+    function show()  { bar.classList.remove('sw-header--hidden'); }
+    function hide()  { bar.classList.add('sw-header--hidden'); }
+
+    function apply() {
+      ticking = false;
+      var y = window.pageYOffset || 0;
+      var h = bar.offsetHeight || 0;
+
+      bar.classList.toggle('sw-header--stuck', y > 4);
+
+      if (y <= h || heldOpen()) { show(); lastY = y; return; }
+
+      var moved = y - lastY;
+      if (Math.abs(moved) < MIN_MOVE) { return; }
+      if (moved > 0) { hide(); } else { show(); }
+      lastY = y;
+    }
+
+    function onScroll() {
+      if (ticking) { return; }
+      ticking = true;
+      window.requestAnimationFrame(function () {
+        try {
+          apply();
+        } catch (e) {
+          show();
+          window.removeEventListener('scroll', onScroll);
+        }
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Tabbing into the nav, or opening the menu, must bring it back.
+    bar.addEventListener('focusin', show);
+    bar.addEventListener('click', function () { window.setTimeout(apply, 0); });
+    apply();
+  }
+
+  /* ----------------------------------------------------------------
      Testimonials slider
 
      The track is a native scroll-snap container — it already works by
@@ -467,6 +560,7 @@
     initParallax(scope);
     initAccordions(scope);
     initSliders(scope);
+    initHeaders(scope);
     initIdleAnimations(scope);
     updateNavbarOffset();
   }
@@ -491,7 +585,7 @@
      ---------------------------------------------------------------- */
   var WATCH = '[data-sw-reveal], .sw-reveal-item, [data-sw-parallax],' +
               '[data-sw-accordion], .sw-testimonials-slider,' +
-              '.sw-hero-gallery, .sw-hero-stage';
+              '.sw-hero-gallery, .sw-hero-stage, .sw-header';
 
   if ('MutationObserver' in window) {
     var rescanTimer;
@@ -519,7 +613,7 @@
   /* Public handle. Kept truthy because the inline head script checks
      window.__swDS to decide whether its failsafe needs to fire. */
   window.__swDS = {
-    version: '2.22.0',
+    version: '2.29.0',
     editor: EDITOR,
     init: boot
   };

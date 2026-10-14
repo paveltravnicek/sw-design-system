@@ -1,6 +1,10 @@
 {
   "categories": [
     {
+      "key": "header",
+      "label": "Záhlaví"
+    },
+    {
       "key": "hero",
       "label": "Hero sekce"
     },
@@ -50,6 +54,11 @@
     }
   ],
   "components": [
+    {
+      "title": "Záhlaví s menu",
+      "file": "component-header.html",
+      "category": "header"
+    },
     {
       "title": "Hero s mockupem",
       "file": "component-hero.html",

@@ -1876,3 +1876,104 @@ button:hover .sw-bubble-icon {
     transition-duration: .001ms !important;
   }
 }
+
+/* ================================================================
+   COMPONENT: HEADER  (sticky bar that hides on the way down)
+
+   The hide/show is a transform only. Nothing here changes opacity or
+   display, so the header is painted from the first frame and counts
+   toward the page's paint metrics like any other content — the whole
+   reason the testimonials block cost us two days.
+
+   RULE 1 still applies: .sw-header--hidden is put on by the scroll
+   handler and taken off by the same handler, which also removes it if
+   it ever throws. With no JS at all the class is never added and the
+   bar simply stays put, which is a perfectly good header.
+   ================================================================ */
+.sw-header {
+  position: sticky;
+  top: 0;
+  z-index: 1030;              /* Bootstrap's own fixed-navbar layer */
+  transition: transform .28s ease, box-shadow .2s ease, background-color .2s ease;
+}
+.sw-header--hidden { transform: translateY(-100%); }
+
+/* Once the page has moved at all, the bar separates itself from the
+   content underneath: a touch of translucency and a soft edge. */
+.sw-header--stuck {
+  background: color-mix(in srgb, var(--bs-body-bg, #fff) 84%, transparent);
+  backdrop-filter: saturate(150%) blur(12px);
+  -webkit-backdrop-filter: saturate(150%) blur(12px);
+  box-shadow: 0 6px 26px rgba(10, 20, 40, .09);
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-header--stuck { background: var(--bs-body-bg, #fff); }
+}
+/* …and tightens up, so scrolling gains a little room. */
+.sw-header--stuck .navbar { padding-top: .5rem; padding-bottom: .5rem; }
+.sw-header .navbar { transition: padding .2s ease; }
+
+/* Underline that grows from the left on hover and stays put on the
+   page you are actually on (add aria-current="page" to that link). */
+.sw-header .navbar-nav .nav-link {
+  position: relative;
+  font-weight: 600;
+}
+/* ::before, not ::after — Bootstrap already owns ::after on
+   .dropdown-toggle for the caret, and claiming it here silently
+   deleted the arrow next to "Tvorba webu". */
+.sw-header .navbar-nav .nav-link::before {
+  content: "";
+  position: absolute;
+  left: var(--bs-nav-link-padding-x, .5rem);
+  right: var(--bs-nav-link-padding-x, .5rem);
+  bottom: .3rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--sw-blue);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .2s ease;
+}
+.sw-header .navbar-nav .nav-link:hover::before,
+.sw-header .navbar-nav .nav-link:focus-visible::before,
+.sw-header .navbar-nav .nav-link[aria-current="page"]::before { transform: scaleX(1); }
+.sw-header .navbar-nav .dropdown-toggle::after { margin-left: .4rem; }
+
+.sw-header .dropdown-menu {
+  border: 1px solid var(--sw-card-border, rgba(16,42,80,.1));
+  border-radius: var(--sw-radius-card, 1rem);
+  padding: .5rem;
+}
+.sw-header .dropdown-item { border-radius: .65rem; }
+
+/* CTA as a pill, so the one action in the bar reads as an action. */
+.sw-header-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .6rem 1.15rem;
+  border-radius: var(--sw-radius-pill, 999px);
+  background: linear-gradient(135deg, var(--sw-blue), #38bdf8);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.sw-header-cta:hover,
+.sw-header-cta:focus-visible { color: #fff; transform: translateY(-1px); box-shadow: var(--sw-shadow-btn, 0 10px 24px rgba(14,116,205,.35)); }
+
+@media (max-width: 1199.98px) {
+  /* Open menu on a phone: the panel scrolls on its own instead of
+     pushing the page, and the bar must not slide away under it. */
+  .sw-header .navbar-collapse { max-height: calc(100dvh - var(--sw-navbar-h, 4rem)); overflow-y: auto; }
+  .sw-header-cta { width: 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-header,
+  .sw-header .navbar,
+  .sw-header .navbar-nav .nav-link::before,
+  .sw-header-cta { transition: none; }
+}
