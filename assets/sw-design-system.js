@@ -345,83 +345,98 @@
      inside it (keyboard users tab into the nav), or we are near the
      top of the page.
 
-     RULE 1 is honoured by the catch: if anything in here ever throws,
-     the bar is put back and the listener detaches, rather than leaving
-     a header stuck off-screen with the only code that could return it
-     now broken.
-     ---------------------------------------------------------------- */
-  var headersArmed = new WeakSet();
+     RULE 1 is honoured twice over: the bar is only ever moved by a
+     transform it can always have taken off again, and if anything in
+     here throws the bar is put straight back — without detaching, which
+     is the mistake the first version made. One hiccup used to kill the
+     behaviour for the rest of the visit, silently.
 
-  function initHeaders(root) {
-    var bars = root.querySelectorAll('.sw-header');
-    for (var i = 0; i < bars.length; i++) {
-      var bar = bars[i];
-      if (headersArmed.has(bar)) { continue; }
-      headersArmed.add(bar);
-      // In the builder the bar never moves: the preview re-renders
-      // constantly and a half-hidden header would only be in the way.
-      if (!EDITOR) { armHeader(bar); }
-    }
+     Deliberately ONE listener on the window for the whole page, which
+     looks the bar up as it goes, instead of a listener armed per
+     element at boot. The per-element version depended on the header
+     being in the DOM at exactly the moment the runtime booted and on a
+     WeakSet remembering it afterwards, and on a real site it ended up
+     never arming at all. Nothing here cares when the header appears,
+     whether a builder swaps it for a fresh node, or how many times
+     this file is re-run.
+     ---------------------------------------------------------------- */
+  var MIN_MOVE  = 6;        // ignore sub-pixel jitter and rubber-banding
+  var headerY   = 0;
+  var headerBar = null;
+  var headerTicking = false;
+  var headerListening = false;
+
+  function currentHeader() {
+    // Cached, but re-queried the moment the cached node leaves the page.
+    if (headerBar && headerBar.isConnected) { return headerBar; }
+    headerBar = D.querySelector('.sw-header');
+    return headerBar;
   }
 
-  function armHeader(bar) {
-    var lastY   = window.pageYOffset || 0;
-    var ticking = false;
-    var MIN_MOVE = 6;      // ignore sub-pixel jitter and rubber-banding
+  function headerShow(bar) { bar.classList.remove('sw-header--hidden'); }
 
-    function keyboardInside() {
-      /* Only a keyboard user pins the bar open. ":focus-visible" is the
-         difference that matters: clicking the hamburger leaves the
-         button focused, and testing for plain focus meant that after
-         one tap the bar never hid again for the rest of the visit.
-         Guarded because the selector throws where it is unsupported. */
-      try { return !!bar.querySelector(':focus-visible'); }
-      catch (e) { return false; }
-    }
+  function headerHeldOpen(bar) {
+    // Bootstrap marks both the collapsed menu and an open dropdown with
+    // .show, so one query covers both. ":focus-visible" rather than
+    // plain focus is the difference that matters: clicking the hamburger
+    // leaves the button focused, and testing for focus meant that after
+    // one tap the bar never hid again. Guarded — the selector throws
+    // where it is unsupported.
+    if (bar.querySelector('.navbar-collapse.show, .dropdown-menu.show')) { return true; }
+    try { return !!bar.querySelector(':focus-visible'); }
+    catch (e) { return false; }
+  }
 
-    function heldOpen() {
-      // Bootstrap marks both the collapsed menu and an open dropdown
-      // with .show, so one query covers both.
-      return !!bar.querySelector('.navbar-collapse.show, .dropdown-menu.show') ||
-             keyboardInside();
-    }
+  function headerApply() {
+    headerTicking = false;
+    var bar = currentHeader();
+    if (!bar || EDITOR) { return; }
 
-    function show()  { bar.classList.remove('sw-header--hidden'); }
-    function hide()  { bar.classList.add('sw-header--hidden'); }
-
-    function apply() {
-      ticking = false;
-      var y = window.pageYOffset || 0;
+    try {
+      var y = window.pageYOffset || (D.scrollingElement ? D.scrollingElement.scrollTop : 0) || 0;
       var h = bar.offsetHeight || 0;
 
       bar.classList.toggle('sw-header--stuck', y > 4);
 
-      if (y <= h || heldOpen()) { show(); lastY = y; return; }
+      if (y <= h || headerHeldOpen(bar)) { headerShow(bar); headerY = y; return; }
 
-      var moved = y - lastY;
+      var moved = y - headerY;
       if (Math.abs(moved) < MIN_MOVE) { return; }
-      if (moved > 0) { hide(); } else { show(); }
-      lastY = y;
+      if (moved > 0) { bar.classList.add('sw-header--hidden'); } else { headerShow(bar); }
+      headerY = y;
+    } catch (e) {
+      // Put it back and carry on. Never stop listening.
+      headerShow(bar);
     }
+  }
 
-    function onScroll() {
-      if (ticking) { return; }
-      ticking = true;
-      window.requestAnimationFrame(function () {
-        try {
-          apply();
-        } catch (e) {
-          show();
-          window.removeEventListener('scroll', onScroll);
-        }
-      });
+  function onHeaderScroll() {
+    if (headerTicking) { return; }
+    headerTicking = true;
+    if (window.requestAnimationFrame) {
+      window.requestAnimationFrame(headerApply);
+      // rAF does not run in a background tab, and a pending frame would
+      // otherwise leave headerTicking stuck true forever.
+      window.setTimeout(function () { if (headerTicking) { headerApply(); } }, 250);
+    } else {
+      headerApply();
     }
+  }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    // Tabbing into the nav, or opening the menu, must bring it back.
-    bar.addEventListener('focusin', show);
-    bar.addEventListener('click', function () { window.setTimeout(apply, 0); });
-    apply();
+  function initHeaders(root) {
+    if (headerListening || EDITOR) { return; }
+    if (!D.querySelector('.sw-header')) { return; }   // nothing to drive yet
+    headerListening = true;
+    headerY = window.pageYOffset || 0;
+    window.addEventListener('scroll', onHeaderScroll, { passive: true });
+    // On the document, not the bar: a builder replacing the header must
+    // not take the listener with it.
+    D.addEventListener('focusin', function () {
+      var bar = currentHeader();
+      if (bar) { headerShow(bar); }
+    });
+    D.addEventListener('click', function () { window.setTimeout(headerApply, 0); });
+    headerApply();
   }
 
   /* ----------------------------------------------------------------
@@ -613,7 +628,7 @@
   /* Public handle. Kept truthy because the inline head script checks
      window.__swDS to decide whether its failsafe needs to fire. */
   window.__swDS = {
-    version: '2.29.0',
+    version: '2.30.0',
     editor: EDITOR,
     init: boot
   };
