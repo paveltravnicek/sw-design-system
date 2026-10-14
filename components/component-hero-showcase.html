@@ -1,0 +1,71 @@
+	<!--
+		Hero s ukázkami práce.
+
+		Záměrně postaveno jako čistý Bootstrap grid v normálním toku dokumentu.
+		Žádné absolutní pozicování, žádná nekonečná animace, žádné nové CSS —
+		rámeček obrázku je sdílená třída .sw-hero-image, zbytek je Bootstrap.
+
+		Velký obrázek je tu jediný s loading="eager" a fetchpriority="high"
+		a nese třídu skip-lazy. Je to největší prvek sekce a tím pádem ten,
+		podle kterého prohlížeč měří načtení stránky — musí se proto dostat
+		do prohlížeče jako skutečný obrázek, ne jako placeholder od
+		optimalizačního pluginu. Zbylé dva jsou menší a lazy, ty nevadí.
+
+		Všechny tři mají vyplněné width/height, takže se stránka při
+		doběhnutí obrázků nepřeskládá.
+	-->
+	<section class="sw-section sw-hero sw-surface--dark" data-sw-c="hero-showcase@1" aria-labelledby="sw-hero-showcase-title">
+		<div class="container">
+			<div class="row g-4 g-lg-5 align-items-center">
+				<div class="col-12 col-lg-6">
+					<div class="lc-block sw-hero-copy">
+						<h1 id="sw-hero-showcase-title" class="sw-h sw-h-display sw-h-gradient sw-fade-in" editable="rich">
+							Weby, které <span>už někomu vydělávají</span>
+						</h1>
+						<p class="sw-lead sw-fade-in-2" editable="inline">
+							Nejsme agentura na všechno. Děláme prezentační weby pro malé a střední firmy — s jasnou cenou předem, hotové do dvou týdnů a postavené tak, aby je šlo roky spravovat bez vašeho zásahu.
+						</p>
+						<div class="sw-actions sw-fade-in-3">
+							<a class="sw-btn h3" href="/referencni-webove-stranky/" editable="inline">
+								Prohlédnout si reference
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-lg-6">
+					<div class="lc-block sw-fade-in-3">
+						<figure class="mb-3">
+							<div class="sw-hero-image">
+								<img class="skip-lazy" src="/wp-content/uploads/webscreen-4.webp" alt="Webové stránky, které jsme vytvořili pro BeStatika s.r.o." loading="eager" fetchpriority="high" decoding="async" width="800" height="500">
+							</div>
+							<figcaption class="small text-white-50 mt-2 mb-0" editable="inline">
+								BeStatika — statika a projekce
+							</figcaption>
+						</figure>
+						<div class="row g-3">
+							<div class="col-6">
+								<figure class="mb-0">
+									<div class="sw-hero-image">
+										<img src="/wp-content/uploads/webscreen-1.webp" alt="Webové stránky, které jsme vytvořili pro Triangl Park" loading="lazy" decoding="async" width="800" height="500">
+									</div>
+									<figcaption class="small text-white-50 mt-2 mb-0" editable="inline">
+										Triangl Park
+									</figcaption>
+								</figure>
+							</div>
+							<div class="col-6">
+								<figure class="mb-0">
+									<div class="sw-hero-image">
+										<img src="/wp-content/uploads/webscreen-5.webp" alt="Webové stránky, které jsme vytvořili pro Podlahářství Mareon" loading="lazy" decoding="async" width="800" height="500">
+									</div>
+									<figcaption class="small text-white-50 mt-2 mb-0" editable="inline">
+										Podlahářství Mareon
+									</figcaption>
+								</figure>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>

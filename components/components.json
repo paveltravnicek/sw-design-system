@@ -71,6 +71,11 @@
       "category": "hero"
     },
     {
+      "title": "Hero s ukázkami práce",
+      "file": "component-hero-showcase.html",
+      "category": "hero"
+    },
+    {
       "title": "3 prvky důvěryhodnosti",
       "file": "component-trust-3col.html",
       "category": "trust"
