@@ -315,7 +315,6 @@
 }
 .sw-btn:hover  { transform: translateY(-2px); box-shadow: 0 24px 70px rgba(0,150,226,.42); }
 .sw-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-.sw-btn--ghost { background: rgba(255,255,255,.07); box-shadow: none; color: rgba(255,255,255,.86); }
 
 
 /* ================================================================
@@ -1473,53 +1472,8 @@
 .sw-testimonials-more .sw-testimonials-wall { margin-top: 1.25rem; }
 .sw-testimonials-lead { margin: 1rem 0 0; color: var(--sw-text-muted); font-size: 1.05rem; line-height: 1.65; }
 
-.sw-testimonials-slider { display: flex; align-items: center; gap: .75rem; }
 
-.sw-testimonials-track {
-  gap: 1.25rem;
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  padding: .25rem .25rem 1rem;
-  scrollbar-width: none;
-  /* Cards fade to transparent right at the edges instead of getting cut
-     off hard — and the small negative margin lets that fading edge
-     visually tuck a little under the arrow buttons, like the card is
-     sliding away behind them rather than just stopping. The arrows get
-     an explicit stacking order below so they stay fully opaque on top
-     of that fade (see .sw-testimonials-arrow). */
-  margin: 0 -1rem;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 2.75rem, #000 calc(100% - 2.75rem), transparent 100%);
-          mask-image: linear-gradient(90deg, transparent 0, #000 2.75rem, #000 calc(100% - 2.75rem), transparent 100%);
-}
-.sw-testimonials-track::-webkit-scrollbar { display: none; }
-/* .col-auto is the row's direct child now (Bootstrap structure, so
-   LiveCanvas's own editing tools recognize this as a real grid, not a
-   bespoke flex box) — the snap point and no-wrap/no-shrink behavior
-   live here instead of on the card two levels down. */
-.sw-testimonials-track > .col-auto {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-}
 
-/* No point fading toward a side that has no more content to reveal —
-   the JS toggles these at the same scroll thresholds it already uses
-   to disable the matching arrow (see updateArrows in the JS). */
-.sw-testimonials-track.is-at-start {
-  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 2.75rem), transparent 100%);
-          mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 2.75rem), transparent 100%);
-}
-.sw-testimonials-track.is-at-end {
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 2.75rem, #000 100%);
-          mask-image: linear-gradient(90deg, transparent 0, #000 2.75rem, #000 100%);
-}
-.sw-testimonials-track.is-at-start.is-at-end {
-  -webkit-mask-image: none;
-          mask-image: none;
-}
 .sw-testimonial-card {
   height: 100%;
   padding: 1.75rem;
@@ -1545,49 +1499,14 @@
   .sw-surface--auto .sw-testimonial-card { background: #eef4fb; }
 }
 
-/* The fixed card width belongs to the horizontal scroller only. In the
-   grid variant (testimonials@2) the card fills its Bootstrap column,
-   so the width cap lives here rather than on the card itself. */
-.sw-testimonials-track .sw-testimonial-card { width: min(82vw, 320px); }
 
 .sw-testimonial-stars { margin: 0 0 .75rem; color: var(--sw-blue); font-size: 1.05rem; letter-spacing: .1em; }
 .sw-testimonial-text { margin: 0 0 1.1rem; color: var(--sw-text); font-size: .96rem; line-height: 1.6; }
 .sw-testimonial-name { margin: 0; font-weight: 700; color: var(--sw-text); }
 
-.sw-testimonials-arrow {
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
-  width: 3rem; height: 3rem;
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  border: 1px solid var(--sw-card-border);
-  background: var(--sw-card-bg);
-  color: var(--sw-text);
-  cursor: pointer;
-  transition: background .2s ease, color .2s ease, border-color .2s ease, opacity .2s ease;
-}
-.sw-testimonials-arrow svg { width: 1.3rem; height: 1.3rem; }
-/* Hover is JS-managed (.is-hover), applied only on real pointer devices
-   (see the (hover:hover) and (pointer:fine) check in the JS) — not CSS
-   :hover. Two separate problems this avoids: (1) browsers disagree on
-   whether an already-active :hover state clears itself when an element
-   becomes disabled without a further pointer event, and (2) touchscreens
-   have no real "hover" at all — a tap can leave :hover looking stuck
-   "on" since there's no mouse to leave with. JS explicitly toggles this
-   class, explicitly clears it the instant a button becomes disabled,
-   and never applies it at all on touch. */
-.sw-testimonials-arrow.is-hover:not(:disabled) {
-  background: var(--sw-blue);
-  border-color: var(--sw-blue);
-  color: #fff;
-}
-.sw-testimonials-arrow:disabled { opacity: .35; cursor: default; pointer-events: none; }
 
 @media (max-width: 575.98px) {
-  .sw-testimonials-arrow { display: none; }
-  .sw-testimonials-track { margin: 0; }
-}
+    }
 
 
 /* ================================================================

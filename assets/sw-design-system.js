@@ -32,7 +32,6 @@
                      with the pointer. Desktop + fine pointer only.
      - Accordion   : [data-sw-accordion] with .sw-faq-item children.
      - Navbar offs.: measures .navbar into --sw-navbar-h for sticky.
-     - Slider      : .sw-testimonials-slider arrows + edge fades.
      - Header      : .sw-header hides on scroll down, returns on up.
    ================================================================ */
 (function () {
@@ -452,84 +451,6 @@
   }
 
   /* ----------------------------------------------------------------
-     Testimonials slider
-
-     The track is a native scroll-snap container — it already works by
-     touch, trackpad and keyboard with no JS. The arrows are a
-     convenience on top: nudge scrollLeft by one card, auto-disable at
-     each end.
-     ---------------------------------------------------------------- */
-  function initSliders(root) {
-    var sliders = root.querySelectorAll('.sw-testimonials-slider');
-    for (var s = 0; s < sliders.length; s++) {
-      (function (slider) {
-        if (wired.has(slider)) return;
-
-        var track = slider.querySelector('.sw-testimonials-track');
-        var prev  = slider.querySelector('.sw-testimonials-arrow--prev');
-        var next  = slider.querySelector('.sw-testimonials-arrow--next');
-        if (!track || !prev || !next) return;
-        wired.add(slider);
-
-        var cardStep = function () {
-          var card = track.querySelector('.sw-testimonial-card');
-          if (!card) return track.clientWidth * 0.8;
-          var style = getComputedStyle(track);
-          return card.getBoundingClientRect().width + parseFloat(style.gap || '0');
-        };
-
-        prev.addEventListener('click', function () {
-          track.scrollBy({ left: -cardStep(), behavior: 'smooth' });
-        });
-        next.addEventListener('click', function () {
-          track.scrollBy({ left: cardStep(), behavior: 'smooth' });
-        });
-
-        /* Hover is tracked in JS (.is-hover) rather than left to CSS
-           :hover — see the note by .sw-testimonials-arrow.is-hover in
-           the stylesheet. Only wired on devices with a real pointer:
-           a touchscreen has no hover to leave with, so the class would
-           look stuck on after a tap. */
-        if (hoverOK.matches) {
-          [prev, next].forEach(function (btn) {
-            btn.addEventListener('mouseenter', function () {
-              if (!btn.disabled) btn.classList.add('is-hover');
-            });
-            btn.addEventListener('mouseleave', function () {
-              btn.classList.remove('is-hover');
-            });
-          });
-        }
-
-        var updateArrows = function () {
-          var max = track.scrollWidth - track.clientWidth - 1;
-          var atStart = track.scrollLeft <= 4;
-          var atEnd = max <= 0 || track.scrollLeft >= max - 4;
-          prev.disabled = atStart;
-          next.disabled = atEnd;
-          // No fade toward a side with nothing left to reveal — see the
-          // .is-at-start / .is-at-end rules in the stylesheet.
-          track.classList.toggle('is-at-start', atStart);
-          track.classList.toggle('is-at-end', atEnd);
-          // A click can disable a button while the mouse never leaves
-          // it, so clear the hover class here rather than waiting on a
-          // mouseleave that may never fire.
-          if (prev.disabled) prev.classList.remove('is-hover');
-          if (next.disabled) next.classList.remove('is-hover');
-        };
-        updateArrows();
-
-        var scrollTimer;
-        track.addEventListener('scroll', function () {
-          clearTimeout(scrollTimer);
-          scrollTimer = setTimeout(updateArrows, 80);
-        });
-        window.addEventListener('resize', updateArrows);
-      })(sliders[s]);
-    }
-  }
-
-  /* ----------------------------------------------------------------
      Pause the never-ending animations while they are off screen
 
      Two of the decorations loop forever: the gallery cards drifting up
@@ -586,7 +507,6 @@
     initReveal(scope);
     initParallax(scope);
     initAccordions(scope);
-    initSliders(scope);
     initHeaders(scope);
     initIdleAnimations(scope);
     updateNavbarOffset();
@@ -611,7 +531,7 @@
      inserts nodes, so there is no feedback loop.
      ---------------------------------------------------------------- */
   var WATCH = '[data-sw-reveal], .sw-reveal-item, [data-sw-parallax],' +
-              '[data-sw-accordion], .sw-testimonials-slider,' +
+              '[data-sw-accordion],' +
               '.sw-hero-gallery, .sw-hero-stage, .sw-header';
 
   if ('MutationObserver' in window) {
@@ -640,7 +560,7 @@
   /* Public handle. Kept truthy because the inline head script checks
      window.__swDS to decide whether its failsafe needs to fire. */
   window.__swDS = {
-    version: '2.32.0',
+    version: '2.33.0',
     editor: EDITOR,
     init: boot
   };

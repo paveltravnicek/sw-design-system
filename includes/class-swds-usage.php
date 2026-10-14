@@ -393,8 +393,27 @@ class SWDS_Usage {
                 foreach ( $cm[0] as $c ) { $used[ $c ] = true; }
             }
         }
-        // Added at runtime, so they never appear in saved markup.
-        foreach ( array( 'sw-anim-on', 'sw-rv', 'sw-ds-reveal' ) as $c ) {
+        /* Classes the runtime adds and removes by itself. They can never
+           appear in saved markup, so without this they look unused and
+           land on the deletion list — .sw-header--hidden and
+           .sw-header--stuck did exactly that, and deleting them would
+           have quietly killed the sticky header.
+
+           Read out of the runtime rather than written down here, for the
+           same reason the component scan above is: a hand-kept list goes
+           stale the first time the JS gains a class, and nothing fails
+           loudly when it does. The literals stay as a fallback in case
+           the file cannot be read. */
+        $runtime_classes = array( 'sw-anim-on', 'sw-rv', 'sw-ds-reveal' );
+        $js_file = SWDS_DIR . 'assets/sw-design-system.js';
+        if ( is_readable( $js_file ) ) {
+            $js = (string) file_get_contents( $js_file );
+            $js = (string) preg_replace( '#/\*.*?\*/#s', '', $js );   // same comment trap as the CSS
+            if ( preg_match_all( "#['\"](sw-[a-z0-9-]+)['\"]#", $js, $jm ) ) {
+                $runtime_classes = array_merge( $runtime_classes, $jm[1] );
+            }
+        }
+        foreach ( array_unique( $runtime_classes ) as $c ) {
             $used[ $c ] = true;
         }
 
