@@ -1470,7 +1470,6 @@
 }
 .sw-testimonial-card {
   height: 100%;
-  width: min(82vw, 320px);
   padding: 1.75rem;
   border-radius: var(--sw-radius-card);
   background: var(--sw-card-bg);
@@ -1493,6 +1492,11 @@
   .sw-surface--light .sw-testimonial-card,
   .sw-surface--auto .sw-testimonial-card { background: #eef4fb; }
 }
+
+/* The fixed card width belongs to the horizontal scroller only. In the
+   grid variant (testimonials@2) the card fills its Bootstrap column,
+   so the width cap lives here rather than on the card itself. */
+.sw-testimonials-track .sw-testimonial-card { width: min(82vw, 320px); }
 
 .sw-testimonial-stars { margin: 0 0 .75rem; color: var(--sw-blue); font-size: 1.05rem; letter-spacing: .1em; }
 .sw-testimonial-text { margin: 0 0 1.1rem; color: var(--sw-text); font-size: .96rem; line-height: 1.6; }
