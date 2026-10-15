@@ -560,7 +560,7 @@
   /* Public handle. Kept truthy because the inline head script checks
      window.__swDS to decide whether its failsafe needs to fire. */
   window.__swDS = {
-    version: '2.35.0',
+    version: '2.36.0',
     editor: EDITOR,
     init: boot
   };
