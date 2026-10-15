@@ -102,10 +102,32 @@ class SWDS_Usage {
             }
             $classes[ $id ] = $all;
 
+            /* Which containers this component animates. The converter
+               needs the expectation, not just what it happens to find:
+               a container the old markup does not have at all leaves no
+               trace to notice, and without this it would stamp the
+               section as current anyway. */
+            $reveal = array();
+            if ( preg_match_all( '#<[a-z0-9]+\b[^>]*\bclass="([^"]*)"[^>]*\bdata-sw-reveal#i', $html, $rm ) ) {
+                foreach ( $rm[1] as $cl ) {
+                    foreach ( preg_split( '#\s+#', trim( $cl ), -1, PREG_SPLIT_NO_EMPTY ) as $c ) {
+                        if ( 0 === strpos( $c, 'sw-' ) ) { $reveal[ $c ] = true; break; }
+                    }
+                }
+            }
+            /* Containers with no sw- class of their own — the footer
+               animates a plain Bootstrap .row — cannot be addressed by
+               the converter, so it must not claim it brought such a
+               component up to date either. */
+            $reveal_total   = preg_match_all( '#\bdata-sw-reveal\b#i', $html );
+            $reveal_unknown = max( 0, $reveal_total - count( $reveal ) );
+
             $out[ $id ] = array(
                 'title'   => $item['title'],
                 'section' => $section,
                 'version' => $version,
+                'reveal'  => array_keys( $reveal ),
+                'revealUnmapped' => $reveal_unknown,
                 'cards'   => preg_match_all( '#class="[^"]*\blc-block\b#', $html ),
                 'mark'    => '',
             );

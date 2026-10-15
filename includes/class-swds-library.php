@@ -50,6 +50,23 @@ class SWDS_Library {
      * Mirrors the manifest structure: categories + components.
      */
     public static function local_definition() {
+        /* components.json is the manifest that ships with the plugin and
+           the one every other part of this file already reads. Keeping a
+           second copy of it written out in PHP meant two sources of truth,
+           and the PHP one quietly fell behind: components added to the
+           JSON — the header, the compact reviews — never appeared in the
+           library, never got a catalogue entry, and so the converter could
+           not stamp them and the usage screen could not report them.
+           Read the manifest; the array below is only the parachute for a
+           missing or corrupt file. */
+        $manifest = SWDS_DIR . self::MANIFEST_PATH;
+        if ( is_readable( $manifest ) ) {
+            $json = json_decode( (string) file_get_contents( $manifest ), true );
+            if ( is_array( $json ) && ! empty( $json['components'] ) ) {
+                return $json;
+            }
+        }
+
         return array(
             'categories' => array(
                 array( 'key' => 'hero',          'label' => 'Hero sekce' ),
@@ -352,9 +369,104 @@ class SWDS_Library {
         $out = array(
             'block'    => array_keys( $block ),
             'editable' => $edit,
+            'reveal'   => self::reveal_map(),
         );
 
         set_transient( self::HINTS_TRANSIENT, $out, self::TTL );
+        return $out;
+    }
+
+    /**
+     * Which containers carry data-sw-reveal, and which of their children
+     * carry .sw-reveal-item — read out of the components, like every
+     * other converter rule.
+     *
+     * A container class only becomes a rule when EVERY occurrence of it
+     * across the whole library carries the attribute. .sw-testimonials-wall
+     * is the reason: the compact reviews use it twice, once revealed and
+     * once — inside the <details> — deliberately not, because an element
+     * that starts out display:none is never seen by the observer and would
+     * stay invisible. Wiring that one up automatically would hide content
+     * for good, so an ambiguous class is left alone and reported instead.
+     *
+     * @return array<string,array{items:array<string>,ambiguous:bool}>
+     */
+    private static function reveal_map() {
+        $seen = array();   // class => array( revealed count, total count, items )
+
+        foreach ( glob( SWDS_DIR . 'components/*.html' ) as $file ) {
+            $html = file_get_contents( $file );
+            if ( ! $html ) { continue; }
+
+            $doc = new DOMDocument();
+            libxml_use_internal_errors( true );
+            $doc->loadHTML( '<?xml encoding="utf-8"?><div>' . $html . '</div>' );
+            libxml_clear_errors();
+
+            $xp = new DOMXPath( $doc );
+            foreach ( $xp->query( '//*[@class]' ) as $el ) {
+                $cls = preg_split( '#\s+#', trim( $el->getAttribute( 'class' ) ), -1, PREG_SPLIT_NO_EMPTY );
+                $own = '';
+                foreach ( $cls as $c ) {
+                    if ( 0 === strpos( $c, 'sw-' ) && 'sw-reveal-item' !== $c ) { $own = $c; break; }
+                }
+                if ( ! $own ) { continue; }
+
+                // Does this element hold reveal items as direct children?
+                $items = array();
+                foreach ( $el->childNodes as $kid ) {
+                    if ( XML_ELEMENT_NODE !== $kid->nodeType || ! $kid->hasAttribute( 'class' ) ) { continue; }
+                    $kc = preg_split( '#\s+#', trim( $kid->getAttribute( 'class' ) ), -1, PREG_SPLIT_NO_EMPTY );
+                    if ( ! in_array( 'sw-reveal-item', $kc, true ) ) { continue; }
+                    foreach ( $kc as $c ) {
+                        if ( 0 === strpos( $c, 'sw-' ) && 'sw-reveal-item' !== $c ) { $items[] = $c; break; }
+                    }
+                }
+                /* Count EVERY occurrence of the class, including ones with
+                   no reveal items at all — that is exactly the case the
+                   ambiguity check exists for. Skipping them here was the
+                   first version's mistake: the second .sw-testimonials-wall
+                   holds no items, so it never got counted and the class came
+                   out looking unanimous. */
+                if ( ! isset( $seen[ $own ] ) ) {
+                    $seen[ $own ] = array( 'revealed' => 0, 'total' => 0, 'items' => array(), 'bare_in_details' => 0 );
+                }
+                $seen[ $own ]['total']++;
+                if ( $el->hasAttribute( 'data-sw-reveal' ) ) {
+                    $seen[ $own ]['revealed']++;
+                    $seen[ $own ]['items'] = array_values( array_unique( array_merge( $seen[ $own ]['items'], $items ) ) );
+                } else {
+                    /* Where a class is revealed in one place and not in
+                       another, the library's own reason is usually that the
+                       bare one sits inside a <details>: closed, it is
+                       display:none, the observer never sees it, and an item
+                       wired up there would stay invisible. When that holds
+                       for every bare occurrence, the exception is not
+                       ambiguity, it is the rule — and the converter can
+                       apply it safely. */
+                    $n = $el->parentNode;
+                    $inside = false;
+                    while ( $n && XML_ELEMENT_NODE === $n->nodeType ) {
+                        if ( 'details' === strtolower( $n->nodeName ) ) { $inside = true; break; }
+                        $n = $n->parentNode;
+                    }
+                    if ( $inside ) { $seen[ $own ]['bare_in_details']++; }
+                }
+            }
+        }
+
+        $out = array();
+        foreach ( $seen as $cls => $d ) {
+            if ( 0 === $d['revealed'] ) { continue; }   // never a reveal container
+            $bare = $d['total'] - $d['revealed'];
+            $out[ $cls ] = array(
+                'items'      => $d['items'],
+                // Bare occurrences that are all inside a <details> are the
+                // documented exception, not a contradiction.
+                'skipDetails' => ( $bare > 0 && $bare === $d['bare_in_details'] ),
+                'ambiguous'  => ( $bare > 0 && $bare !== $d['bare_in_details'] ),
+            );
+        }
         return $out;
     }
 }

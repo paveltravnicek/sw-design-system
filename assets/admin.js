@@ -286,6 +286,58 @@
         });
       });
 
+      /* --- 4b. reveal wiring, also from the library -------------
+         A component can gain animation between revisions, and until now
+         the converter had no idea: it bumped the stamp and left the
+         insides alone, so the page claimed to be current while nothing
+         animated. The rules come from the components themselves — which
+         containers carry data-sw-reveal and which children carry
+         .sw-reveal-item (SWDS_Library::reveal_map). */
+      var reveal = hints.reveal || {};
+      function revealGapsIn(scope) {
+        var gaps = [];
+        Object.keys(reveal).forEach(function (cls) {
+          var rule = reveal[cls];
+          scope.querySelectorAll('.' + cls).forEach(function (box) {
+            if (rule.skipDetails && box.closest('details')) { return; }
+            if (!box.hasAttribute('data-sw-reveal')) { gaps.push(cls); }
+          });
+        });
+        return gaps;
+      }
+
+      Object.keys(reveal).forEach(function (cls) {
+        var rule = reveal[cls];
+        var found = root.querySelectorAll('.' + cls);
+        if (!found.length) { return; }
+
+        if (rule.ambiguous) {
+          count('Sekci .' + cls + ' jsem animaci nedoplnil — v knihovně je jednou s animací a jednou bez, takže se z kódu nepozná, která varianta to je. Vlož ji prosím z knihovny ručně.');
+          return;
+        }
+
+        found.forEach(function (box) {
+          /* Inside a closed <details> the element is display:none, the
+             observer never sees it, and anything wired here would stay
+             invisible for good. The library leaves those alone and so do we. */
+          if (rule.skipDetails && box.closest('details')) { return; }
+
+          if (!box.hasAttribute('data-sw-reveal')) {
+            box.setAttribute('data-sw-reveal', '');
+            count('Doplněn atribut data-sw-reveal na .' + cls + ' (bez něj se obsah neanimuje).');
+          }
+          (rule.items || []).forEach(function (ic) {
+            Array.prototype.forEach.call(box.children, function (kid) {
+              if (kid.nodeType !== 1) { return; }
+              if (!kid.classList.contains(ic)) { return; }
+              if (kid.classList.contains('sw-reveal-item')) { return; }
+              kid.classList.add('sw-reveal-item');
+              count('Doplněna třída sw-reveal-item na .' + ic + '.');
+            });
+          });
+        });
+      });
+
       /* --- 5. version stamp ------------------------------------
          data-sw-c tells the usage screen exactly what a section is and
          which revision of the markup it carries — without it, all it can
@@ -299,8 +351,32 @@
           // conversion is what makes the markup current.
           var cur = (sec.getAttribute('data-sw-c').split('@')[0] || '').trim();
           if (cat[cur] && sec.getAttribute('data-sw-c') !== cur + '@' + cat[cur].version) {
-            sec.setAttribute('data-sw-c', cur + '@' + cat[cur].version);
-            count('Razítko .' + cur + ' zvednuto na @' + cat[cur].version + '.');
+            /* Only claim the new revision if the markup actually reached
+               it. The old code bumped the stamp unconditionally, so a
+               section converted from @4 to nothing announced itself as @6
+               — and the usage screen, which trusts the stamp, then stopped
+               reporting it. A stamp that lies is worse than an old one. */
+            /* Did the markup actually reach the new revision? Compare
+               against what the component is supposed to animate, not
+               against what happens to be in front of us — a container the
+               old markup never had leaves nothing to notice. */
+            var gaps = revealGapsIn(sec);
+            (cat[cur].reveal || []).forEach(function (cls) {
+              if (!sec.querySelector('.' + cls + '[data-sw-reveal]') && gaps.indexOf(cls) === -1) {
+                gaps.push(cls);
+              }
+            });
+            if (cat[cur].revealUnmapped) {
+              gaps.push('animovaný obal bez vlastní sw- třídy, který neumím najít');
+            }
+            if (gaps.length) {
+              count('Razítko .' + cur + ' jsem NEzvedl na @' + cat[cur].version +
+                    ' — tahle sekce se v nové verzi liší i jinde, než co umím doplnit (' +
+                    gaps.join(', ') + '). Vlož ji prosím z knihovny a přenes si do ní texty; razítko by jinak tvrdilo, že je aktuální.');
+            } else {
+              sec.setAttribute('data-sw-c', cur + '@' + cat[cur].version);
+              count('Razítko .' + cur + ' zvednuto na @' + cat[cur].version + '.');
+            }
           }
           return;
         }
