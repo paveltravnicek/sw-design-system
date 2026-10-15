@@ -58,20 +58,37 @@ class SWDS_Usage {
             if ( ! file_exists( $path ) ) { continue; }
 
             $html = file_get_contents( $path );
-            $id   = preg_replace( '#^component-|\.html$#', '', $item['file'] );
+
+            /* The stamp is the identity, not the file name.
+               This used to derive the id from the file name and then look
+               for that id inside the stamp, so the moment the two drifted
+               apart — component-testimonials-compact.html carrying
+               data-sw-c="testimonials@6" — the pattern missed, the version
+               silently fell back to 1, and every page using it looked
+               up to date no matter how far behind it was. Read whatever
+               the stamp says instead; the file name is only the fallback
+               for a component that has no stamp yet. */
+            $id      = preg_replace( '#^component-|\.html$#', '', $item['file'] );
+            $version = 1;
+            if ( preg_match( '#data-sw-c="([a-z0-9-]+)@(\d+)"#i', $html, $m ) ) {
+                $id      = strtolower( $m[1] );
+                $version = (int) $m[2];
+            }
+            /* Two components must never answer to the same stamp, or the
+               second would overwrite the first and take its version with
+               it. Keep the file-name id for the loser so both stay
+               visible rather than one disappearing without a word. */
+            if ( isset( $out[ $id ] ) ) {
+                $id = preg_replace( '#^component-|\.html$#', '', $item['file'] );
+            }
 
             $section = '';
-            $version = 1;
             if ( preg_match( '#<section\b[^>]*class="([^"]*)"#', $html, $m ) ) {
                 foreach ( preg_split( '#\s+#', $m[1], -1, PREG_SPLIT_NO_EMPTY ) as $c ) {
                     if ( 'sw-section' === $c || 0 === strpos( $c, 'sw-surface' ) ) { continue; }
                     if ( 0 === strpos( $c, 'sw-' ) ) { $section = $c; break; }
                 }
             }
-            if ( preg_match( '#data-sw-c="' . preg_quote( $id, '#' ) . '@(\d+)"#', $html, $m ) ) {
-                $version = (int) $m[1];
-            }
-
             // Every sw- class anywhere in the component, and how many
             // lc-block elements it has. Both are used below to tell apart
             // components that share a family.
@@ -186,11 +203,18 @@ class SWDS_Usage {
             $wpdb->prepare(
                 "SELECT ID, post_title, post_type, post_status, post_content
                    FROM {$wpdb->posts}
-                  WHERE post_content LIKE %s
+                  WHERE ( post_content LIKE %s OR post_content LIKE %s )
                     AND post_status IN ('publish','draft','pending','private','future')
                     AND post_type NOT IN ('revision','attachment','nav_menu_item')
                ORDER BY post_title ASC
                   LIMIT %d",
+                /* The stamp is the precise marker and the only one every
+                   component carries. Filtering on sw-section alone missed
+                   anything that is not a <section> — the header is a
+                   <header> and has no sw-section anywhere, so it could
+                   never show up in the report at all. sw-section stays as
+                   the fallback for older markup saved before stamps. */
+                '%' . $wpdb->esc_like( 'data-sw-c=' ) . '%',
                 '%' . $wpdb->esc_like( 'sw-section' ) . '%',
                 self::MAX_POSTS + 1
             )
@@ -250,17 +274,30 @@ class SWDS_Usage {
         $len = strlen( $content );
         $pos = 0;
 
+        /* Two ways in. The stamp is the reliable one and works whatever
+           the element is; sw-section on a <section> is the fallback for
+           markup saved before stamps existed.
+
+           This used to look for <section class="…sw-section…"> and
+           nothing else, which meant a component that is not a <section>
+           could never be reported — the header is a <header> and has no
+           sw-section anywhere on it, so it was invisible to this screen
+           no matter how out of date the page was. */
+        $vzor = '#<([a-z][a-z0-9]*)\b[^>]*(?:data-sw-c="|class="[^"]*\bsw-section\b)#i';
+
         while ( $pos < $len ) {
-            if ( ! preg_match( '#<section\b[^>]*class="[^"]*\bsw-section\b#i', $content, $m, PREG_OFFSET_CAPTURE, $pos ) ) {
+            if ( ! preg_match( $vzor, $content, $m, PREG_OFFSET_CAPTURE, $pos ) ) {
                 break;
             }
             $start = $m[0][1];
+            $tag   = strtolower( $m[1][0] );
 
-            // Walk forward counting nested <section> tags to find the close.
+            // Walk forward counting nested tags of the same name to find
+            // the close that belongs to this one.
             $depth = 0;
             $i     = $start;
             $end   = false;
-            while ( preg_match( '#</?section\b#i', $content, $t, PREG_OFFSET_CAPTURE, $i ) ) {
+            while ( preg_match( '#</?' . preg_quote( $tag, '#' ) . '\b#i', $content, $t, PREG_OFFSET_CAPTURE, $i ) ) {
                 $at = $t[0][1];
                 if ( '/' === $content[ $at + 1 ] ) {
                     $depth--;
