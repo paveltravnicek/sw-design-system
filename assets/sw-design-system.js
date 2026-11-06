@@ -494,6 +494,70 @@
   }
 
   /* ----------------------------------------------------------------
+     Copy-to-clipboard buttons (connector addresses)
+
+     The address to copy is read from the .sw-conn-url next to the
+     button at click time, never from a data-* attribute: the visible
+     address is editable in the builder, and a button that copies
+     something other than what is on screen is worse than no button.
+
+     navigator.clipboard needs a secure context, so it is absent on
+     plain http and in a few embedded webviews. The fallback selects
+     the address instead and tells the reader to copy it — doing
+     nothing silently would look like a broken button.
+     ---------------------------------------------------------------- */
+  function copyFeedback(btn, text) {
+    var label = btn.querySelector('.sw-conn-copy-label') || btn;
+    if (btn.__swCopyTimer) { window.clearTimeout(btn.__swCopyTimer); }
+    if (!btn.__swCopyIdle) { btn.__swCopyIdle = label.textContent; }
+    label.textContent = text;
+    btn.classList.add('is-copied');
+    btn.__swCopyTimer = window.setTimeout(function () {
+      label.textContent = btn.__swCopyIdle;
+      btn.classList.remove('is-copied');
+    }, 2000);
+  }
+
+  function selectAddress(url) {
+    try {
+      var sel = window.getSelection();
+      var rng = D.createRange();
+      rng.selectNodeContents(url);
+      sel.removeAllRanges();
+      sel.addRange(rng);
+    } catch (e) { /* selection unavailable — the message below still shows */ }
+  }
+
+  function initCopy(root) {
+    var btns = root.querySelectorAll('.sw-conn-copy');
+    for (var i = 0; i < btns.length; i++) {
+      (function (btn) {
+        if (wired.has(btn) || EDITOR) { return; }
+        wired.add(btn);
+
+        btn.addEventListener('click', function () {
+          var box = btn.closest ? btn.closest('.sw-conn-addr') : null;
+          var url = box ? box.querySelector('.sw-conn-url') : null;
+          var text = url ? (url.textContent || '').trim() : '';
+          if (!text) { return; }
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              copyFeedback(btn, 'Zkopírováno');
+            })['catch'](function () {
+              selectAddress(url);
+              copyFeedback(btn, 'Označeno — zkopírujte');
+            });
+          } else {
+            selectAddress(url);
+            copyFeedback(btn, 'Označeno — zkopírujte');
+          }
+        });
+      })(btns[i]);
+    }
+  }
+
+  /* ----------------------------------------------------------------
      Boot / re-boot
 
      Everything above is idempotent and takes a root, so this can run
@@ -509,6 +573,7 @@
     initAccordions(scope);
     initHeaders(scope);
     initIdleAnimations(scope);
+    initCopy(scope);
     updateNavbarOffset();
   }
 

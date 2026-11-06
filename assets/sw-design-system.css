@@ -963,6 +963,98 @@
 
 
 /* ================================================================
+   COMPONENT: CONNECTORS (two cards, each offering an MCP endpoint)
+
+   Deliberately NOT a card of its own. The shell, the tick list and
+   the check mark are the pricing card's — same object (an offer the
+   visitor picks between), different payload — so a later change to
+   the card style keeps both in step instead of drifting apart. Only
+   what pricing has no equivalent for lives here: the kicker above
+   the name, the one-fact meta row, and the address row.
+
+   The copy button carries no URL of its own: the runtime reads the
+   text out of the .sw-conn-url next to it. A data-* copy of the
+   address would go stale the moment the visible one is edited, and
+   a button that copies a different address than the one on screen
+   is worse than no button.
+   ================================================================ */
+.sw-conn-kicker {
+  margin: 0 0 .4rem;
+  font-size: .8rem; font-weight: 750;
+  letter-spacing: .09em; text-transform: uppercase;
+  color: var(--sw-blue-2, #38bdf8);
+}
+
+/* Takes the slot (and the top rule) that .sw-price-value has in the
+   pricing card, but holds a label/value pair rather than a figure. */
+.sw-conn-meta {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: .25rem .5rem;
+  margin: 0 0 1.5rem; padding: 1.1rem 0 0;
+  border-top: 1px solid var(--sw-card-border);
+  font-size: .95rem; line-height: 1.45;
+}
+.sw-conn-meta-label { color: var(--sw-text-muted); }
+.sw-conn-meta-value { font-weight: 750; color: var(--sw-text); }
+
+.sw-conn-addr { margin: 0; }
+.sw-conn-addr-label {
+  margin: 0 0 .45rem;
+  font-size: .82rem; font-weight: 700;
+  color: var(--sw-text-muted);
+}
+/* Button under the address, not beside it. Measured: the address needs
+   ~330px and the card's inner width is ~355px, so side by side there is
+   no width left for a button and the address breaks across two lines in
+   every card — the one string a visitor has to read and copy whole. In a
+   column the address keeps one line down to tablet and the layout is the
+   same at every breakpoint instead of flipping at an awkward width. */
+.sw-conn-addr-row {
+  display: flex; flex-direction: column; align-items: flex-start;
+  gap: .5rem;
+  padding: .6rem .75rem;
+  border: 1px solid var(--sw-card-border);
+  border-radius: var(--sw-radius-img);
+  background: color-mix(in srgb, var(--sw-blue) 9%, transparent);
+}
+@supports not (background: color-mix(in srgb, red, blue)) {
+  .sw-conn-addr-row { background: rgba(0,150,226,.09); }
+}
+/* anywhere (not break-all) lets a narrow phone card break at the slashes
+   instead of mid-word. */
+.sw-conn-url {
+  align-self: stretch; min-width: 0;
+  font-size: .8rem; line-height: 1.5;
+  color: var(--sw-text);
+  overflow-wrap: anywhere;
+}
+.sw-conn-copy {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 2.25rem; padding: .4rem .9rem;
+  border: 1px solid var(--sw-card-border);
+  border-radius: var(--sw-radius-pill);
+  background: var(--sw-card-bg);
+  color: var(--sw-text);
+  font: inherit; font-size: .85rem; font-weight: 750;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease;
+}
+.sw-conn-copy:hover,
+.sw-conn-copy.is-copied { border-color: var(--sw-blue); color: var(--sw-blue-2, #38bdf8); }
+.sw-conn-copy:focus-visible { outline: 2px solid var(--sw-blue-2, #38bdf8); outline-offset: 2px; }
+
+.sw-conn-help { margin: .9rem 0 0; font-size: .95rem; }
+
+/* The pricing intro caps at 46rem, which is right for a heading plus two
+   paragraphs of subtitle. Here the heading stands alone and two short
+   sentences in it need a little more room, or the second one breaks away
+   from its own verb ("Vyberte" / "si,"). Scoped: the pricing component
+   keeps its own measure. */
+.sw-conn .sw-pricing-intro { max-width: 54rem; }
+
+
+/* ================================================================
    COMPONENT: PROCESS / STEPS (numbered, 2 columns)
    Surface-aware via .sw-surface--light/dark/auto on the section.
    

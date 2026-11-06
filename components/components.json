@@ -105,6 +105,11 @@
       "category": "content"
     },
     {
+      "title": "Dva konektory (MCP adresy)",
+      "file": "component-connectors.html",
+      "category": "content"
+    },
+    {
       "title": "Postup spolupráce",
       "file": "component-journey.html",
       "category": "process"
