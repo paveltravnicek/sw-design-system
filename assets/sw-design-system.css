@@ -1066,11 +1066,11 @@
    each item is a real dt/dd pair inside a <dl>: the pairing lives in
    the markup and the alignment comes from CSS, not from <br>.
    ================================================================ */
-.sw-pricelist-vat {
-  margin: 0 0 clamp(1.5rem, 3vw, 2.25rem);
-  font-size: .92rem;
-  color: var(--sw-text-muted);
-}
+/* The intro is .sw-pricing-intro / -title / -subtitle, the same one the
+   tariff cards use, so the two price sections on one page share a
+   heading treatment instead of each inventing their own. The "bez DPH"
+   line lives in that subtitle: it belongs with the reader's first look
+   at the section, not stranded on a line of its own. */
 
 /* The card shell is written out rather than borrowed from
    .sw-price-card: that one is a flex column whose whole job is to push
