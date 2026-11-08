@@ -1055,6 +1055,118 @@
 
 
 /* ================================================================
+   COMPONENT: PRICE LIST (individual services, one price per row)
+
+   The pricing components sell tiers; this one prices single services.
+   The hand-built version this replaces wrote every item as
+   <p><strong>name</strong><br><span>note</span><br>price</p> — three
+   unrelated lines that only look like a table. Nothing in that markup
+   says which price belongs to which service, so a screen reader reads
+   it as one run-on paragraph and a crawler sees no price at all. Here
+   each item is a real dt/dd pair inside a <dl>: the pairing lives in
+   the markup and the alignment comes from CSS, not from <br>.
+   ================================================================ */
+.sw-pricelist-vat {
+  margin: 0 0 clamp(1.5rem, 3vw, 2.25rem);
+  font-size: .92rem;
+  color: var(--sw-text-muted);
+}
+
+/* The card shell is written out rather than borrowed from
+   .sw-price-card: that one is a flex column whose whole job is to push
+   a button down to its bottom edge, which a price group has no use
+   for. Only the tokens are shared, so the two still match. */
+.sw-pricelist-group {
+  height: 100%;
+  padding: clamp(1.4rem, 2.6vw, 2rem);
+  border: 1px solid var(--sw-card-border);
+  border-radius: var(--sw-radius-card);
+  background: var(--sw-card-bg);
+  box-shadow: var(--sw-shadow-card);
+  -webkit-backdrop-filter: blur(var(--sw-card-blur));
+          backdrop-filter: blur(var(--sw-card-blur));
+}
+
+/* Own size, like .sw-price-name has: --sw-h-large runs to 4.8rem at the
+   normal scale, and six of those inside one section would read as six
+   sections. */
+.sw-pricelist-group-title {
+  margin: 0 0 .7rem;
+  font-size: clamp(1.45rem, 2.2vw, 1.9rem);
+  line-height: 1.15;
+  color: var(--sw-text);
+}
+.sw-pricelist-group-lead {
+  margin: 0 0 1.5rem;
+  font-size: .98rem; line-height: 1.6;
+  color: var(--sw-text-muted);
+  text-wrap: pretty;
+}
+
+.sw-pricelist { margin: 0; }
+.sw-pricelist-item {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: .3rem 1.25rem;
+  padding: .85rem 0;
+  border-top: 1px solid var(--sw-card-border);
+}
+.sw-pricelist-item:first-child { border-top: 0; padding-top: 0; }
+.sw-pricelist-item:last-child { padding-bottom: 0; }
+
+/* A 14rem basis keeps the name and the price on one line inside a
+   half-width card and lets them stack on a phone, with no breakpoint
+   to keep in sync with the grid. */
+.sw-pricelist-term { flex: 1 1 14rem; min-width: 0; margin: 0; }
+.sw-pricelist-name {
+  display: block;
+  font-weight: 750; line-height: 1.35;
+  color: var(--sw-text);
+}
+/* font-weight is reset explicitly: the note lives inside a <dt>, which
+   every browser renders bold by default. */
+.sw-pricelist-note {
+  display: block; margin-top: .2rem;
+  font-weight: 400;
+  font-size: .88rem; line-height: 1.5;
+  color: var(--sw-text-muted);
+  text-wrap: pretty;
+}
+
+.sw-pricelist-price {
+  flex: 0 0 auto;
+  margin: 0 0 0 auto;        /* holds the right edge even on a short name */
+  font-weight: 750; font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--sw-text);
+  white-space: nowrap;
+  text-align: right;
+}
+.sw-pricelist-unit { font-weight: 600; font-size: .85em; color: var(--sw-text-muted); }
+
+/* Stacked on a phone the price reads better under its own name than
+   pushed out to the right edge of the card. */
+@media (max-width: 575.98px) {
+  .sw-pricelist-price { margin-left: 0; text-align: left; }
+}
+
+.sw-pricelist-block { margin-top: clamp(2.25rem, 4.5vw, 3.5rem); }
+
+.sw-pricelist-incl { list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; gap: 1rem 2.5rem; }
+@media (min-width: 768px) { .sw-pricelist-incl { grid-template-columns: 1fr 1fr; } }
+.sw-pricelist-incl li {
+  display: flex; align-items: flex-start; gap: .7rem;
+  font-size: .98rem; line-height: 1.55;
+  color: var(--sw-text-muted);
+}
+.sw-pricelist-incl strong { color: var(--sw-text); font-weight: 750; }
+
+/* The two closing blocks sit straight on the section surface with no
+   card around them, so the rows need a measure of their own — without
+   it a note runs past 100 characters on a wide screen. */
+.sw-pricelist--wide { max-width: 60rem; }
+
+
+/* ================================================================
    COMPONENT: PROCESS / STEPS (numbered, 2 columns)
    Surface-aware via .sw-surface--light/dark/auto on the section.
    

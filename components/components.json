@@ -110,6 +110,11 @@
       "category": "content"
     },
     {
+      "title": "Ceník služeb (položkový)",
+      "file": "component-pricelist.html",
+      "category": "content"
+    },
+    {
       "title": "Postup spolupráce",
       "file": "component-journey.html",
       "category": "process"
